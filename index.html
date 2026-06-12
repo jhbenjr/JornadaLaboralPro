@@ -693,40 +693,55 @@
 
         async function loadLocalData() {
             if(!currentUser) return;
-            try {
-                const userDocRef = window.fsDoc(window.firebaseDb, "users", currentUser.uid);
-                
-                if (unsubscribeSnapshot) unsubscribeSnapshot();
-                
-                unsubscribeSnapshot = window.fsOnSnapshot(userDocRef, async (docSnap) => {
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        allShifts = data.shifts || [];
-                        allTasks = data.tasks || [];
-                        weekSettings = data.settings || {};
-                        currentShiftStart = data.activeShift ? new Date(data.activeShift) : null;
-                        
-                        // Force re-render whenever data changes remotely
-                        if (typeof renderData === 'function') {
-                            renderData();
+            return new Promise((resolve) => {
+                try {
+                    const userDocRef = window.fsDoc(window.firebaseDb, "users", currentUser.uid);
+                    
+                    if (unsubscribeSnapshot) unsubscribeSnapshot();
+                    
+                    let isFirstLoad = true;
+
+                    unsubscribeSnapshot = window.fsOnSnapshot(userDocRef, async (docSnap) => {
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            allShifts = data.shifts || [];
+                            allTasks = data.tasks || [];
+                            weekSettings = data.settings || {};
+                            currentShiftStart = data.activeShift ? new Date(data.activeShift) : null;
+                            
+                            if (typeof renderData === 'function') {
+                                renderData();
+                            }
+                        } else {
+                            const storedShifts = localStorage.getItem('mjpro_shifts');
+                            if (storedShifts) {
+                                console.log("Migrating local data to cloud...");
+                                allShifts = JSON.parse(storedShifts);
+                                allTasks = JSON.parse(localStorage.getItem('mjpro_tasks') || "[]");
+                                weekSettings = JSON.parse(localStorage.getItem('mjpro_settings') || "{}");
+                                const active = localStorage.getItem('mjpro_active_shift');
+                                currentShiftStart = active ? new Date(parseInt(active)) : null;
+                                await saveLocalData();
+                                showToast("Datos locales sincronizados a la nube.");
+                            }
                         }
-                    } else {
-                        const storedShifts = localStorage.getItem('mjpro_shifts');
-                        if (storedShifts) {
-                            console.log("Migrating local data to cloud...");
-                            allShifts = JSON.parse(storedShifts);
-                            allTasks = JSON.parse(localStorage.getItem('mjpro_tasks') || "[]");
-                            weekSettings = JSON.parse(localStorage.getItem('mjpro_settings') || "{}");
-                            const active = localStorage.getItem('mjpro_active_shift');
-                            currentShiftStart = active ? new Date(parseInt(active)) : null;
-                            await saveLocalData();
-                            showToast("Datos locales sincronizados a la nube.");
+
+                        if (isFirstLoad) {
+                            isFirstLoad = false;
+                            resolve();
                         }
-                    }
-                }, (error) => {
-                    console.error("Snapshot error:", error);
-                });
-            } catch(e) { console.error("Error setting up real-time sync:", e); }
+                    }, (error) => {
+                        console.error("Snapshot error:", error);
+                        if (isFirstLoad) {
+                            isFirstLoad = false;
+                            resolve();
+                        }
+                    });
+                } catch(e) { 
+                    console.error("Error setting up real-time sync:", e); 
+                    resolve();
+                }
+            });
         }
 
         async function saveLocalData() {
@@ -1234,7 +1249,7 @@
             currentShiftStart = new Date();
             saveLocalData();
             showToast("Turno iniciado exitosamente.");
-            // UI is updated via onSnapshot calling renderData() -> updateShiftUI()
+            if (typeof renderData === 'function') renderData();
         }
 
         window.adjustStartTime = function() {
@@ -1272,7 +1287,7 @@
             currentShiftStart = null;
             saveLocalData();
             showToast("Turno finalizado.");
-            // UI is updated via onSnapshot calling renderData() -> updateShiftUI()
+            if (typeof renderData === 'function') renderData();
         }
 
         window.addManualShift = function() {
