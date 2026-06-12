@@ -973,24 +973,6 @@
 
             showToast("☁️ Conectado a la nube y sincronizado");
             renderData();
-            
-            if (currentShiftStart) {
-                const stText = document.getElementById('status-text');
-                stText.textContent = 'En Turno';
-                stText.className = 'text-2xl font-black text-emerald-500 tracking-tight';
-                document.getElementById('current-shift-time').classList.remove('hidden');
-                document.getElementById('start-time-input').value = formatHHMM(currentShiftStart);
-                
-                const btnIn = document.getElementById('btn-in');
-                const btnOut = document.getElementById('btn-out');
-                btnIn.disabled = true;
-                btnIn.className = 'w-full sm:w-36 bg-slate-100 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-slate-400 dark:text-slate-500 px-5 py-3.5 rounded-xl font-bold transition-all duration-300 cursor-not-allowed flex items-center justify-center';
-                btnIn.innerHTML = '<i data-lucide="lock" class="w-4 h-4 mr-2"></i> Activo';
-                
-                btnOut.disabled = false;
-                btnOut.className = 'w-full sm:w-36 bg-red-500 hover:bg-red-600 text-white px-5 py-3.5 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 shadow-red-500/20 flex items-center justify-center';
-                lucide.createIcons();
-            }
         }
 
         window.handleWeekChange = function() {
@@ -1215,30 +1197,44 @@
             return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
         }
 
+        window.updateShiftUI = function() {
+            const stText = document.getElementById('status-text');
+            const btnIn = document.getElementById('btn-in');
+            const btnOut = document.getElementById('btn-out');
+
+            if (currentShiftStart) {
+                stText.textContent = 'En Turno';
+                stText.className = 'text-2xl font-black text-emerald-500 tracking-tight';
+                document.getElementById('current-shift-time').classList.remove('hidden');
+                document.getElementById('start-time-input').value = formatHHMM(currentShiftStart);
+                
+                btnIn.disabled = true;
+                btnIn.className = 'w-full sm:w-36 bg-slate-100 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-slate-400 dark:text-slate-500 px-5 py-3.5 rounded-xl font-bold transition-all duration-300 cursor-not-allowed flex items-center justify-center';
+                btnIn.innerHTML = '<i data-lucide="lock" class="w-4 h-4 mr-2"></i> Activo';
+                
+                btnOut.disabled = false;
+                btnOut.className = 'w-full sm:w-36 bg-red-500 hover:bg-red-600 text-white px-5 py-3.5 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 shadow-red-500/20 flex items-center justify-center';
+            } else {
+                stText.textContent = 'Fuera de turno';
+                stText.className = 'text-2xl font-black text-slate-800 dark:text-white tracking-tight';
+                document.getElementById('current-shift-time').classList.add('hidden');
+                
+                btnIn.disabled = false;
+                btnIn.className = 'w-full sm:w-36 bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white px-5 py-3.5 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center';
+                btnIn.innerHTML = 'Entrada';
+                
+                btnOut.disabled = true;
+                btnOut.className = 'w-full sm:w-36 bg-slate-100 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-slate-400 dark:text-slate-500 px-5 py-3.5 rounded-xl font-bold transition-all duration-300 cursor-not-allowed flex items-center justify-center';
+            }
+            lucide.createIcons();
+        }
+
         window.clockIn = function() {
             if (currentShiftStart !== null) return;
             currentShiftStart = new Date();
             saveLocalData();
-            
-            const stText = document.getElementById('status-text');
-            stText.textContent = 'En Turno';
-            stText.className = 'text-2xl font-black text-emerald-500 tracking-tight';
-            
-            document.getElementById('current-shift-time').classList.remove('hidden');
-            document.getElementById('start-time-input').value = formatHHMM(currentShiftStart);
-            
-            const btnIn = document.getElementById('btn-in');
-            const btnOut = document.getElementById('btn-out');
-            
-            btnIn.disabled = true;
-            btnIn.className = 'w-full sm:w-36 bg-slate-100 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-slate-400 dark:text-slate-500 px-5 py-3.5 rounded-xl font-bold transition-all duration-300 cursor-not-allowed flex items-center justify-center';
-            btnIn.innerHTML = '<i data-lucide="lock" class="w-4 h-4 mr-2"></i> Activo';
-            
-            btnOut.disabled = false;
-            btnOut.className = 'w-full sm:w-36 bg-red-500 hover:bg-red-600 text-white px-5 py-3.5 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 shadow-red-500/20 flex items-center justify-center';
-            
-            lucide.createIcons();
             showToast("Turno iniciado exitosamente.");
+            // UI is updated via onSnapshot calling renderData() -> updateShiftUI()
         }
 
         window.adjustStartTime = function() {
@@ -1275,25 +1271,8 @@
             allShifts.push({ dbId: Date.now().toString(), ...shiftData });
             currentShiftStart = null;
             saveLocalData();
-            renderData();
-            
-            const stText = document.getElementById('status-text');
-            stText.textContent = 'Fuera de turno';
-            stText.className = 'text-2xl font-black text-slate-800 dark:text-white tracking-tight';
-            document.getElementById('current-shift-time').classList.add('hidden');
-            
-            const btnIn = document.getElementById('btn-in');
-            const btnOut = document.getElementById('btn-out');
-            
-            btnIn.disabled = false;
-            btnIn.className = 'w-full sm:w-36 bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white px-5 py-3.5 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center';
-            btnIn.innerHTML = 'Entrada';
-            
-            btnOut.disabled = true;
-            btnOut.className = 'w-full sm:w-36 bg-slate-100 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-slate-400 dark:text-slate-500 px-5 py-3.5 rounded-xl font-bold transition-all duration-300 cursor-not-allowed flex items-center justify-center';
-
-            lucide.createIcons();
-            showToast("Turno finalizado y guardado.");
+            showToast("Turno finalizado.");
+            // UI is updated via onSnapshot calling renderData() -> updateShiftUI()
         }
 
         window.addManualShift = function() {
@@ -1358,7 +1337,7 @@
                 document.getElementById('top-remaining-hours').innerHTML = '<i data-lucide="check-circle-2" class="w-8 h-8 mb-1"></i>';
                 lucide.createIcons();
             } else {
-                remainingBox.className = "flex flex-col items-center justify-center p-4 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl border border-indigo-100 dark:border-indigo-500/20 shadow-sm min-h-[100px] transition-all";
+                remainingBox.className = "flex flex-col items-center justify-center p-4 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl border border-indigo-200 dark:border-indigo-500/30 shadow-sm min-h-[100px] transition-all";
                 remainingLabel.textContent = "Faltan";
                 document.getElementById('top-remaining-hours').innerHTML = formatDecimalHours(remaining) + '<span class="text-sm font-bold opacity-70 ml-0.5">h</span>';
             }
@@ -1395,7 +1374,7 @@
             const accumulated = Object.values(workedHoursPerDay).reduce((a,b)=>a+b, 0);
             const remaining = Math.max(0, limit - accumulated);
             
-            const daysOrder = mode === 1 ? [1, 2, 3, 4, 5] : [1, 2, 3, 4, 5, 6]; // Depende del modo
+            const daysOrder = mode === 1 ? [1, 2, 3, 4, 5] : [1, 2, 3, 4, 5, 6]; 
             let planHtml = '<div class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full mt-3">';
             
             const baseTargets = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
@@ -1414,7 +1393,7 @@
                 let tempRemaining = remaining;
                 
                 if (mode === 2) {
-                    fixedPending = pendingDays.filter(d => d === 6); // Sábado fijo
+                    fixedPending = pendingDays.filter(d => d === 6); 
                     adjustablePending = pendingDays.filter(d => d !== 6);
                 } else {
                     adjustablePending = [...pendingDays];
@@ -1453,7 +1432,6 @@
                 let displayHtml = '';
                 
                 if (worked === 0) {
-                    // Días pendientes
                     bgColor = 'bg-indigo-50 dark:bg-indigo-500/10';
                     textColor = 'text-indigo-600 dark:text-indigo-400';
                     border = 'border-indigo-200 dark:border-indigo-500/30';
@@ -1461,21 +1439,17 @@
                     const displayTarget = target > 0 ? formatDecimalHours(target) + 'h' : '0:00h';
                     displayHtml = `<span class="text-base sm:text-lg font-black ${textColor} tabular-nums">${displayTarget}</span>`;
                 } else {
-                    // Días trabajados
-                    const tolerance = 0.02; // Aprox 1 minuto
+                    const tolerance = 0.02;
                     
                     if (Math.abs(worked - target) <= tolerance) {
-                        // Justo en la meta (Cian)
                         bgColor = 'bg-cyan-50 dark:bg-cyan-500/10';
                         textColor = 'text-cyan-600 dark:text-cyan-400';
                         border = 'border-cyan-200 dark:border-cyan-500/30';
                     } else if (worked > target) {
-                        // Pasé de tiempo (Rojo)
                         bgColor = 'bg-red-50 dark:bg-red-500/10';
                         textColor = 'text-red-600 dark:text-red-400';
                         border = 'border-red-200 dark:border-red-500/30';
                     } else {
-                        // Salí antes de tiempo (Verde)
                         bgColor = 'bg-emerald-50 dark:bg-emerald-500/10';
                         textColor = 'text-emerald-600 dark:text-emerald-400';
                         border = 'border-emerald-200 dark:border-emerald-500/30';
@@ -1500,7 +1474,7 @@
                 `;
             });
 
-            planHtml += '</div>'; // Cierra contenedor de cajitas
+            planHtml += '</div>';
 
             container.innerHTML = planHtml;
             lucide.createIcons();
@@ -1597,8 +1571,8 @@
         function renderShifts() {
             const tbody = document.getElementById('shifts-body');
             tbody.innerHTML = '';
-            const weekShifts = allShifts.filter(s => s.weekId === currentWeekId);
             
+            const weekShifts = allShifts.filter(s => getIsoWeekString(new Date(s.start)) === currentWeekId || s.weekId === currentWeekId);
             const hasLiveShift = currentShiftStart && getIsoWeekString(currentShiftStart) === currentWeekId;
 
             if(weekShifts.length === 0 && !hasLiveShift) {
