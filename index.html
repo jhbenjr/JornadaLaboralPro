@@ -181,9 +181,9 @@
                 <div class="flex justify-center items-center gap-2 mb-4 h-8 cursor-text" id="pin-dots" onclick="document.getElementById('hidden-pin-input').focus()">
                     <!-- Dots -->
                 </div>
-                <input type="password" id="hidden-pin-input" class="opacity-0 absolute inset-0 w-full h-full cursor-text" maxlength="6" oninput="window.handleHiddenPinInput(event)">
+                <input type="password" id="hidden-pin-input" class="opacity-0 absolute inset-0 w-full h-full cursor-text pointer-events-none" maxlength="6" oninput="window.handleHiddenPinInput(event)">
                 
-                <div class="grid grid-cols-3 gap-2 sm:gap-3 w-full mx-auto">
+                <div class="grid grid-cols-3 gap-2 sm:gap-3 w-full mx-auto relative z-10">
                     <button class="numpad-btn" onclick="addPin('1')">1</button>
                     <button class="numpad-btn" onclick="addPin('2')">2</button>
                     <button class="numpad-btn" onclick="addPin('3')">3</button>
