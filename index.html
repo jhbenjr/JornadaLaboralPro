@@ -41,7 +41,7 @@
         }
     </script>
     
-    <style>
+    <style type="text/tailwindcss">
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         body { 
@@ -112,6 +112,18 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        .numpad-btn {
+            @apply w-full py-4 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-dark-bg dark:hover:bg-[#202023] text-2xl font-bold text-slate-700 dark:text-slate-200 transition-all border border-slate-200/50 dark:border-dark-border active:scale-95 shadow-sm;
+        }
+        .numpad-btn-special {
+            @apply w-full py-4 rounded-2xl bg-transparent hover:bg-slate-50 dark:hover:bg-dark-bg transition-all active:scale-95 flex items-center justify-center;
+        }
+        .pin-dot {
+            @apply w-3.5 h-3.5 rounded-full border-2 border-indigo-500 transition-all duration-200;
+        }
+        .pin-dot.filled {
+            @apply bg-indigo-500 scale-110;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-dark-bg dark:text-slate-200 antialiased min-h-screen flex flex-col selection:bg-indigo-500/30">
@@ -124,16 +136,16 @@
                 </div>
                 <div class="flex flex-col">
                     <h1 class="text-sm sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block">Control de Jornada</h1>
-                    <div class="flex items-center space-x-1 sm:space-x-2">
+                    <div class="flex items-center space-x-1 sm:space-x-2" id="header-week-container">
                         <i data-lucide="calendar-clock" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-500 shrink-0"></i>
                         <input type="week" id="week-selector" onchange="handleWeekChange()" class="text-[11px] sm:text-xs font-semibold bg-transparent text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 outline-none cursor-pointer transition-colors min-w-[120px]" title="Selecciona una semana">
                     </div>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-2 sm:space-x-5 shrink-0">
+            <div id="nav-actions-container" class="flex items-center space-x-2 sm:space-x-5 shrink-0">
                 <div class="flex items-center space-x-2 sm:space-x-4 bg-white/50 dark:bg-dark-card/50 backdrop-blur-md px-2.5 sm:px-5 py-1.5 sm:py-2.5 rounded-xl sm:rounded-2xl border border-slate-200/60 dark:border-dark-border shadow-sm shrink-0">
-                    <div class="hidden md:flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-300">
+                    <div class="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-300">
                         <i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i>
                         <span id="date-display" class="font-medium">--</span>
                     </div>
@@ -153,36 +165,122 @@
             </div>
         </div>
     </nav>
-
     <!-- Splash Screen / Login Screen -->
     <div id="login-screen" class="fixed inset-0 bg-slate-50 dark:bg-dark-bg z-[200] flex flex-col items-center justify-center p-4 transition-opacity duration-500">
-        <div class="bg-white dark:bg-dark-card w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden border border-slate-200/60 dark:border-dark-border p-8 text-center flex flex-col items-center">
-            <div class="w-20 h-20 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-500 mb-6 shadow-sm">
-                <i data-lucide="clock" class="w-10 h-10"></i>
+        <div class="bg-white dark:bg-dark-card w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden border border-slate-200/60 dark:border-dark-border p-6 sm:p-8 text-center flex flex-col items-center relative">
+            <div class="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-500 mb-4 shadow-sm">
+                <i data-lucide="shield-check" class="w-8 h-8"></i>
             </div>
-            <h2 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight mb-2">Mi Jornada PRO</h2>
-            <p class="text-slate-500 dark:text-slate-400 mb-8 text-sm">Inicia sesión para sincronizar tus horas y tareas en la nube.</p>
+            <h2 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight mb-6">Acceso Kiosco</h2>
             
-            <button id="btn-login" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-white px-4 py-3.5 rounded-xl font-bold transition-all shadow-sm flex items-center justify-center gap-3">
-                <svg class="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Continuar con Google
-            </button>
-            <button id="btn-skip-login" class="w-full mt-3 bg-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 px-4 py-2 rounded-xl text-sm font-medium transition-all">
-                Continuar sin conexión (Modo Local)
-            </button>
+            <div class="w-full mb-4">
+                <input type="text" id="kiosk-username" placeholder="Usuario" class="w-full px-4 py-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl text-center font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all uppercase" autocomplete="off" spellcheck="false">
+            </div>
+            
+            <div class="w-full mb-6 relative">
+                <div class="flex justify-center items-center gap-2 mb-4 h-8 cursor-text" id="pin-dots" onclick="document.getElementById('hidden-pin-input').focus()">
+                    <!-- Dots -->
+                </div>
+                <input type="password" id="hidden-pin-input" class="opacity-0 absolute inset-0 w-full h-full cursor-text" maxlength="6" oninput="window.handleHiddenPinInput(event)">
+                
+                <div class="grid grid-cols-3 gap-2 sm:gap-3 w-full mx-auto">
+                    <button class="numpad-btn" onclick="addPin('1')">1</button>
+                    <button class="numpad-btn" onclick="addPin('2')">2</button>
+                    <button class="numpad-btn" onclick="addPin('3')">3</button>
+                    <button class="numpad-btn" onclick="addPin('4')">4</button>
+                    <button class="numpad-btn" onclick="addPin('5')">5</button>
+                    <button class="numpad-btn" onclick="addPin('6')">6</button>
+                    <button class="numpad-btn" onclick="addPin('7')">7</button>
+                    <button class="numpad-btn" onclick="addPin('8')">8</button>
+                    <button class="numpad-btn" onclick="addPin('9')">9</button>
+                    
+                    <button class="numpad-btn-special text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300" onclick="clearPin()">
+                        <i data-lucide="x" class="w-6 h-6 mx-auto"></i>
+                    </button>
+                    <button class="numpad-btn" onclick="addPin('0')">0</button>
+                    <button class="numpad-btn-special text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400" onclick="delPin()">
+                        <i data-lucide="delete" class="w-6 h-6 mx-auto"></i>
+                    </button>
+                </div>
+            </div>
 
-            <div id="login-loader" class="hidden mt-4 text-indigo-500">
-                <i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i>
+            <button onclick="attemptLogin()" class="w-full bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white px-4 py-3.5 rounded-xl font-bold transition-all shadow-sm flex items-center justify-center gap-2 mb-3">
+                <i data-lucide="log-in" class="w-5 h-5"></i>
+                Ingresar
+            </button>
+            <button onclick="attemptReadonly()" class="w-full bg-transparent text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+                Ver Resumen (Sin PIN)
+            </button>
+            
+            <div id="login-loader" class="absolute inset-0 bg-white/80 dark:bg-dark-card/80 backdrop-blur-sm hidden flex-col items-center justify-center rounded-3xl z-10">
+                <i data-lucide="loader-2" class="w-8 h-8 animate-spin text-indigo-500 mb-2"></i>
+                <span class="text-sm font-bold text-slate-600 dark:text-slate-300" id="login-status-text">Verificando...</span>
             </div>
         </div>
     </div>
 
-    <main id="app-content" class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8 flex-1 w-full opacity-0 transition-opacity duration-500 pointer-events-none">
+    <!-- Admin Dashboard -->
+    <main id="admin-dashboard" class="hidden flex max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-col gap-8 flex-1 w-full opacity-0 transition-opacity duration-500">
+        <div class="flex items-center justify-between mb-2">
+            <div>
+                <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Panel Maestro</h1>
+                <p class="text-slate-500 dark:text-slate-400 font-medium mt-1">Gestión de usuarios y configuración del Kiosco.</p>
+            </div>
+            <button onclick="openUserModal()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-sm">
+                <i data-lucide="user-plus" class="w-5 h-5"></i>
+                <span class="hidden sm:inline">Nuevo Usuario</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="admin-users-grid">
+            <!-- Users will be populated here by JS -->
+        </div>
+    </main>
+
+    <!-- User Edit/Create Modal -->
+    <div id="user-modal" class="fixed inset-0 z-[300] hidden flex-col items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeUserModal()"></div>
+        <div class="relative bg-white dark:bg-dark-card w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200/60 dark:border-dark-border p-6 sm:p-8">
+            <h2 id="user-modal-title" class="text-2xl font-bold text-slate-800 dark:text-white mb-6">Nuevo Usuario</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Usuario (ID Login)</label>
+                    <input type="text" id="admin-input-username" class="w-full px-4 py-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none uppercase" placeholder="ej. JUANP">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Nombre Completo</label>
+                    <input type="text" id="admin-input-fullname" class="w-full px-4 py-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Juan Pérez">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">PIN (Mínimo 4 dígitos)</label>
+                    <input type="text" id="admin-input-pin" inputmode="numeric" maxlength="6" class="w-full px-4 py-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="123456">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Avatar</label>
+                    <div class="grid grid-cols-5 gap-2" id="avatar-selection-grid">
+                        <!-- Avatars populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex gap-3">
+                <button onclick="closeUserModal()" class="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-dark-bg dark:hover:bg-[#2a2a2e] text-slate-700 dark:text-slate-300 rounded-xl font-bold transition-all">Cancelar</button>
+                <button onclick="saveUserFromAdmin()" class="flex-1 px-4 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="save" class="w-5 h-5"></i>
+                    Guardar
+                </button>
+            </div>
+            
+            <button id="admin-btn-delete" onclick="deleteUserFromAdmin()" class="hidden w-full mt-4 px-4 py-3 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl font-bold transition-all items-center justify-center gap-2 border border-red-200 dark:border-red-500/20">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                Eliminar Usuario
+            </button>
+        </div>
+    </div>
+
+    <main id="app-content" class="hidden max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8 flex-1 w-full opacity-0 transition-opacity duration-500 pointer-events-none">
         
         <div class="bg-white dark:bg-dark-card rounded-3xl shadow-sm border border-slate-200/60 dark:border-dark-border p-6 sm:p-8 transition-all duration-300 w-full">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -219,7 +317,7 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
-            <div class="lg:col-span-7 space-y-8">
+            <div id="col-left" class="lg:col-span-7 space-y-8">
                 
                 <div class="bg-white dark:bg-dark-card rounded-3xl shadow-sm border border-slate-200/60 dark:border-dark-border overflow-hidden transition-all duration-300">
                     <div class="border-b border-slate-100 dark:border-dark-border px-6 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -316,7 +414,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-dark-card rounded-3xl shadow-sm border border-slate-200/60 dark:border-dark-border p-6 sm:p-8 transition-all duration-300">
+                <div id="history-container" class="bg-white dark:bg-dark-card rounded-3xl shadow-sm border border-slate-200/60 dark:border-dark-border p-6 sm:p-8 transition-all duration-300">
                     <div class="flex justify-between items-center mb-6 gap-4">
                         <h2 class="text-xl font-bold text-slate-800 dark:text-white tracking-tight flex items-center">
                             <i data-lucide="list" class="w-5 h-5 mr-2 text-indigo-500"></i> Historial Semanal
@@ -353,7 +451,7 @@
                 </div>
             </div>
 
-            <div class="lg:col-span-5 flex flex-col h-[850px]">
+            <div id="col-right" class="lg:col-span-5 flex flex-col h-[850px]">
                 <div class="bg-white dark:bg-dark-card rounded-3xl shadow-sm border border-slate-200/60 dark:border-dark-border flex flex-col h-full overflow-hidden transition-all duration-300">
                     
                     <div class="p-6 border-b border-slate-100 dark:border-dark-border bg-gradient-to-b from-slate-50/50 to-white dark:from-dark-bg/50 dark:to-dark-card">
@@ -558,7 +656,7 @@
                 <button onclick="closeConfigModal()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white bg-white dark:bg-dark-card rounded-full shadow-sm border border-slate-200 dark:border-dark-border transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div class="p-6 bg-white dark:bg-dark-card space-y-5">
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4" id="setting-hours-container">
                     <div class="relative group">
                         <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Meta Semanal (h)</label>
                         <input type="number" id="limit-input" value="48" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-bold">
@@ -569,7 +667,7 @@
                     </div>
                 </div>
                 
-                <div>
+                <div id="setting-mode-container">
                     <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Modo de Trabajo</label>
                     <div class="flex bg-slate-100 dark:bg-dark-bg p-1.5 rounded-xl w-full">
                         <button onclick="setTempMode(1)" id="config-mode-1" class="flex-1 px-3 py-2 text-sm font-bold rounded-lg bg-white dark:bg-dark-card shadow-sm text-indigo-600 dark:text-indigo-400 transition-all">5 Días</button>
@@ -673,12 +771,85 @@
         window.fsDoc = doc;
         window.fsSetDoc = setDoc;
         window.fsGetDoc = getDoc;
+        window.fsGetDocs = getDocs;
+        window.fsDeleteDoc = deleteDoc;
         window.fsCollection = collection;
         window.fsOnSnapshot = onSnapshot;
     </script>
 
     <script>
         let currentUser = null;
+        let currentKioskUser = null;
+        let isReadonly = false;
+        let currentPin = "";
+
+        window.addPin = function(num) {
+            if(currentPin.length < 6) {
+                currentPin += num;
+                updatePinDots();
+                if(currentPin.length === 6) {
+                    setTimeout(() => attemptLogin(), 150);
+                }
+            }
+        }
+        window.delPin = function() {
+            if(currentPin.length > 0) {
+                currentPin = currentPin.slice(0, -1);
+                updatePinDots();
+            }
+        }
+        window.clearPin = function() {
+            currentPin = "";
+            updatePinDots();
+        }
+        function updatePinDots() {
+            const dotsContainer = document.getElementById('pin-dots');
+            if(!dotsContainer) return;
+            dotsContainer.innerHTML = '';
+            for(let i=0; i<6; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'pin-dot' + (i < currentPin.length ? ' filled' : '');
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        window.handleHiddenPinInput = function(e) {
+            const val = e.target.value.replace(/\D/g, '');
+            e.target.value = val;
+            currentPin = val;
+            updatePinDots();
+            if(currentPin.length === 6) {
+                setTimeout(() => attemptLogin(), 150);
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const loginScreen = document.getElementById('login-screen');
+            if(!loginScreen || loginScreen.classList.contains('hidden')) return;
+
+            if (document.activeElement.id === 'kiosk-username') {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('kiosk-username').blur();
+                }
+                return;
+            }
+
+            if (e.key >= '0' && e.key <= '9') {
+                e.preventDefault();
+                window.addPin(e.key);
+            } else if (e.key === 'Backspace') {
+                e.preventDefault();
+                window.delPin();
+            } else if (e.key === 'Escape' || e.key === 'Delete') {
+                window.clearPin();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (currentPin.length >= 4 && window.attemptLogin) {
+                    window.attemptLogin();
+                }
+            }
+        });
         let allShifts = [];
         let allTasks = [];
         let weekSettings = {};
@@ -697,10 +868,10 @@
         let unsubscribeSnapshot = null;
 
         async function loadLocalData() {
-            if(!currentUser) return;
+            if(!currentKioskUser) return;
             return new Promise((resolve) => {
                 try {
-                    const userDocRef = window.fsDoc(window.firebaseDb, "users", currentUser.uid);
+                    const userDocRef = window.fsDoc(window.firebaseDb, "jornada_users", currentKioskUser);
                     
                     if (unsubscribeSnapshot) unsubscribeSnapshot();
                     
@@ -718,16 +889,20 @@
                                 renderData();
                             }
                         } else {
-                            const storedShifts = localStorage.getItem('mjpro_shifts');
-                            if (storedShifts) {
-                                console.log("Migrating local data to cloud...");
-                                allShifts = JSON.parse(storedShifts);
-                                allTasks = JSON.parse(localStorage.getItem('mjpro_tasks') || "[]");
-                                weekSettings = JSON.parse(localStorage.getItem('mjpro_settings') || "{}");
-                                const active = localStorage.getItem('mjpro_active_shift');
-                                currentShiftStart = active ? new Date(parseInt(active)) : null;
+                            if(!isReadonly) {
+                                if(currentKioskUser === 'jhbenjr') {
+                                    const storedShifts = localStorage.getItem('mjpro_shifts');
+                                    if (storedShifts) {
+                                        console.log("Migrating local data to jhbenjr...");
+                                        allShifts = JSON.parse(storedShifts);
+                                        allTasks = JSON.parse(localStorage.getItem('mjpro_tasks') || "[]");
+                                        weekSettings = JSON.parse(localStorage.getItem('mjpro_settings') || "{}");
+                                        const active = localStorage.getItem('mjpro_active_shift');
+                                        currentShiftStart = active ? new Date(parseInt(active)) : null;
+                                        showToast("Datos locales recuperados para JhBenjr");
+                                    }
+                                }
                                 await saveLocalData();
-                                showToast("Datos locales sincronizados a la nube.");
                             }
                         }
 
@@ -750,9 +925,10 @@
         }
 
         async function saveLocalData() {
-            if(!currentUser) return;
+            if(!currentKioskUser || isReadonly) return;
             try {
-                const userDocRef = window.fsDoc(window.firebaseDb, "users", currentUser.uid);
+                const userDocRef = window.fsDoc(window.firebaseDb, "jornada_users", currentKioskUser);
+                // merge: true so we don't overwrite pin and role
                 const payload = {
                     shifts: allShifts,
                     tasks: allTasks,
@@ -760,7 +936,7 @@
                     activeShift: currentShiftStart ? currentShiftStart.getTime() : null,
                     lastUpdated: new Date().toISOString()
                 };
-                await window.fsSetDoc(userDocRef, payload);
+                await window.fsSetDoc(userDocRef, payload, { merge: true });
             } catch(e) { 
                 console.error("Error saving data:", e); 
                 showToast("Error guardando en la nube", true);
@@ -771,6 +947,12 @@
             document.getElementById('limit-input').value = weekSettings[currentWeekId]?.limit || 48;
             document.getElementById('regular-hours-input').value = weekSettings[currentWeekId]?.regular || 10;
             setTempMode(currentAdjustMode || 1);
+
+            const isAdm = (localStorage.getItem('kiosk_user') === 'admin');
+            const hoursCont = document.getElementById('setting-hours-container');
+            const modeCont = document.getElementById('setting-mode-container');
+            if(hoursCont) hoursCont.style.display = isAdm ? 'none' : 'grid';
+            if(modeCont) modeCont.style.display = isAdm ? 'none' : 'block';
 
             const modal = document.getElementById('config-modal');
             modal.classList.remove('hidden');
@@ -985,13 +1167,8 @@
 
             applyWeekSettings();
 
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                window.toggleTheme(true);
-            }
             lucide.createIcons();
-            updateTimeData();
-            setInterval(updateTimeData, 1000);
-
+            startClock();
             showToast("☁️ Conectado a la nube y sincronizado");
             renderData();
         }
@@ -1033,8 +1210,10 @@
             } else {
                 html.classList.remove('dark');
                 if(icon) icon.setAttribute('data-lucide', 'moon');
-                if(flatpickrDark) flatpickrDark.setAttribute('disabled', 'true');
+                if(flatpickrDark) flatpickrDark.setAttribute('disabled', 'disabled');
             }
+            
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
             lucide.createIcons();
         }
 
@@ -1126,6 +1305,14 @@
             }
         }
 
+        let clockInterval = null;
+        function startClock() {
+            if(!clockInterval) {
+                updateTimeData();
+                clockInterval = setInterval(updateTimeData, 1000);
+            }
+        }
+
         function updateTimeData() {
             const now = new Date();
             
@@ -1134,14 +1321,15 @@
             
             if (isMarylandTime) {
                 document.getElementById('live-clock').textContent = mdTime;
-                document.getElementById('live-clock-md').textContent = svTime + " SV";
+                if(document.getElementById('live-clock-md')) document.getElementById('live-clock-md').textContent = svTime + " SV";
             } else {
                 document.getElementById('live-clock').textContent = svTime;
-                document.getElementById('live-clock-md').textContent = mdTime + " MD";
+                if(document.getElementById('live-clock-md')) document.getElementById('live-clock-md').textContent = mdTime + " MD";
             }
             
             const dateStr = now.toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             document.getElementById('date-display').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+
             
             if (currentShiftStart && getIsoWeekString(currentShiftStart) === currentWeekId) {
                 updateProgress();
@@ -2067,91 +2255,453 @@
             }, 2000);
         }
 
-        // Firebase Auth Logic
+        // --- Admin Dashboard Logic ---
+        let adminUsers = [];
+        let currentEditUserId = null;
+        const availableAvatars = [
+            { id: 'bot-1', color: 'bg-blue-100 text-blue-500' },
+            { id: 'bot-2', color: 'bg-indigo-100 text-indigo-500' },
+            { id: 'bot-3', color: 'bg-violet-100 text-violet-500' },
+            { id: 'bot-4', color: 'bg-fuchsia-100 text-fuchsia-500' },
+            { id: 'bot-5', color: 'bg-rose-100 text-rose-500' },
+            { id: 'bot-6', color: 'bg-orange-100 text-orange-500' },
+            { id: 'bot-7', color: 'bg-amber-100 text-amber-500' },
+            { id: 'bot-8', color: 'bg-emerald-100 text-emerald-500' },
+            { id: 'bot-9', color: 'bg-cyan-100 text-cyan-500' },
+            { id: 'bot-10', color: 'bg-slate-100 text-slate-500' }
+        ];
+        let selectedAvatarId = 'bot-1';
+
+        window.setupLogoutButton = function() {
+            if (!document.getElementById('btn-logout')) {
+                const navActions = document.getElementById('nav-actions-container');
+                if(navActions) {
+                    const btnLogout = document.createElement('button');
+                    btnLogout.id = 'btn-logout';
+                    btnLogout.className = 'w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-dark-bg text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shadow-sm border border-slate-200 dark:border-dark-border shrink-0';
+                    btnLogout.innerHTML = '<i data-lucide="log-out" class="w-5 h-5"></i>';
+                    btnLogout.title = "Cerrar sesión";
+                    btnLogout.onclick = () => {
+                        localStorage.removeItem('kiosk_user');
+                        currentKioskUser = null;
+                        isReadonly = false;
+                        window.signOut(window.firebaseAuth).then(() => {
+                            window.location.reload();
+                        });
+                    };
+                    navActions.appendChild(btnLogout);
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        window.openAdminDashboard = async function() {
+            try {
+                document.getElementById('header-week-container').style.display = 'none';
+                startClock();
+                await window.signInAnonymously(window.firebaseAuth);
+                window.setupLogoutButton();
+                renderAvatars();
+                await fetchUsersFromAdmin();
+            } catch (err) {
+                console.error(err);
+                showToast("Error iniciando administrador", true);
+            }
+        }
+
+        async function fetchUsersFromAdmin() {
+            try {
+                const usersCol = window.fsCollection(window.firebaseDb, "jornada_users");
+                const snap = await window.fsGetDocs(usersCol);
+                adminUsers = [];
+                snap.forEach(doc => {
+                    adminUsers.push({ id: doc.id, ...doc.data() });
+                });
+                console.log("Usuarios cargados:", adminUsers.length);
+                renderAdminUsers();
+            } catch (err) {
+                console.error(err);
+                showToast("Error cargando usuarios: " + err.message, true);
+            }
+        }
+
+        function renderAdminUsers() {
+            const grid = document.getElementById('admin-users-grid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            
+            const filteredUsers = adminUsers.filter(u => u.id !== 'admin');
+
+            if (filteredUsers.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 bg-slate-50 dark:bg-dark-card rounded-2xl border border-dashed border-slate-300 dark:border-dark-border"><p class="text-slate-500 font-bold">No hay usuarios registrados aún.</p></div>`;
+                return;
+            }
+
+            filteredUsers.forEach(user => {
+                const avatar = availableAvatars.find(a => a.id === (user.avatar || 'bot-1')) || availableAvatars[0];
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col gap-4";
+                
+                card.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full ${avatar.color} flex items-center justify-center">
+                            <i data-lucide="bot" class="w-6 h-6"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-slate-800 dark:text-white truncate">${user.fullName || user.id}</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium truncate">@${user.id}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-auto">
+                        <div class="text-xs font-bold bg-slate-100 dark:bg-dark-bg text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-lg">
+                            PIN: ${user.pin || 'N/A'}
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openUserModal('${user.id}')" class="p-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-lg transition-all" title="Editar">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="adminObserveUser('${user.id}')" class="p-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-lg transition-all" title="Ver Registros">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        window.openUserModal = function(userId = null) {
+            currentEditUserId = userId;
+            const modal = document.getElementById('user-modal');
+            const title = document.getElementById('user-modal-title');
+            const usernameInput = document.getElementById('admin-input-username');
+            const fullnameInput = document.getElementById('admin-input-fullname');
+            const pinInput = document.getElementById('admin-input-pin');
+            const delBtn = document.getElementById('admin-btn-delete');
+            
+            if (userId) {
+                const user = adminUsers.find(u => u.id === userId);
+                title.innerText = "Editar Usuario";
+                usernameInput.value = user.id;
+                fullnameInput.value = user.fullName || '';
+                pinInput.value = user.pin || '';
+                selectAvatar(user.avatar || 'bot-1');
+                delBtn.classList.remove('hidden');
+                delBtn.classList.add('flex');
+            } else {
+                title.innerText = "Nuevo Usuario";
+                usernameInput.value = '';
+                fullnameInput.value = '';
+                pinInput.value = '';
+                selectAvatar('bot-1');
+                delBtn.classList.add('hidden');
+                delBtn.classList.remove('flex');
+            }
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        window.closeUserModal = function() {
+            const modal = document.getElementById('user-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function renderAvatars() {
+            const grid = document.getElementById('avatar-selection-grid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            availableAvatars.forEach(av => {
+                const btn = document.createElement('button');
+                btn.className = `w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2 border-transparent ${av.color}`;
+                btn.innerHTML = `<i data-lucide="bot" class="w-6 h-6"></i>`;
+                btn.onclick = () => selectAvatar(av.id);
+                btn.id = `avatar-btn-${av.id}`;
+                grid.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        function selectAvatar(id) {
+            selectedAvatarId = id;
+            availableAvatars.forEach(av => {
+                const btn = document.getElementById(`avatar-btn-${av.id}`);
+                if(btn) {
+                    if(av.id === id) {
+                        btn.classList.add('border-indigo-500', 'scale-110', 'shadow-md');
+                    } else {
+                        btn.classList.remove('border-indigo-500', 'scale-110', 'shadow-md');
+                    }
+                }
+            });
+        }
+
+        window.saveUserFromAdmin = async function() {
+            const username = document.getElementById('admin-input-username').value.trim().toLowerCase();
+            const fullName = document.getElementById('admin-input-fullname').value.trim();
+            const pin = document.getElementById('admin-input-pin').value.trim();
+            
+            if(!username || !pin) return showToast("Usuario y PIN son obligatorios", true);
+            if(pin.length < 4) return showToast("El PIN debe tener al menos 4 dígitos", true);
+
+            const userData = {
+                pin: pin,
+                role: 'employee',
+                fullName: fullName,
+                avatar: selectedAvatarId
+            };
+
+            try {
+                if (currentEditUserId && currentEditUserId !== username) {
+                    const oldUser = adminUsers.find(u => u.id === currentEditUserId);
+                    const allData = { ...oldUser, ...userData };
+                    delete allData.id;
+                    
+                    await window.fsSetDoc(window.fsDoc(window.firebaseDb, "jornada_users", username), allData);
+                    await window.fsDeleteDoc(window.fsDoc(window.firebaseDb, "jornada_users", currentEditUserId));
+                } else {
+                    await window.fsSetDoc(window.fsDoc(window.firebaseDb, "jornada_users", username), userData, { merge: true });
+                }
+                showToast("Usuario guardado exitosamente");
+                closeUserModal();
+                await fetchUsersFromAdmin();
+            } catch(e) {
+                console.error(e);
+                showToast("Error guardando usuario", true);
+            }
+        }
+
+        window.deleteUserFromAdmin = async function() {
+            if(!currentEditUserId) return;
+            if(!confirm(`¿Estás seguro de eliminar al usuario @${currentEditUserId}? Esta acción es irreversible.`)) return;
+
+            try {
+                await window.fsDeleteDoc(window.fsDoc(window.firebaseDb, "jornada_users", currentEditUserId));
+                showToast("Usuario eliminado");
+                closeUserModal();
+                await fetchUsersFromAdmin();
+            } catch(e) {
+                console.error(e);
+                showToast("Error eliminando usuario", true);
+            }
+        }
+
+        window.adminObserveUser = async function(username) {
+            try {
+                document.getElementById('admin-dashboard').classList.add('hidden', 'opacity-0');
+                
+                const existingBtn = document.getElementById('btn-return-admin');
+                if(existingBtn) existingBtn.remove();
+
+                const returnBtn = document.createElement('button');
+                returnBtn.id = "btn-return-admin";
+                returnBtn.className = "ml-auto bg-slate-800 dark:bg-slate-700 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-700 transition-all";
+                returnBtn.innerHTML = `<i data-lucide="arrow-left" class="w-4 h-4"></i> <span class="hidden sm:inline">Volver a Admin</span>`;
+                returnBtn.onclick = () => {
+                    document.getElementById('app-content').classList.add('hidden', 'opacity-0', 'pointer-events-none');
+                    document.getElementById('btn-return-admin').remove();
+                    document.getElementById('admin-dashboard').classList.remove('hidden');
+                    setTimeout(() => document.getElementById('admin-dashboard').classList.remove('opacity-0'), 50);
+                };
+                
+                const headerContainer = document.querySelector('nav > div.max-w-7xl');
+                if (headerContainer) {
+                    headerContainer.appendChild(returnBtn);
+                }
+                lucide.createIcons();
+
+                isReadonly = true;
+                currentKioskUser = username;
+                await initApp();
+                
+                document.getElementById('app-content').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('app-content').classList.remove('opacity-0', 'pointer-events-none');
+                }, 100);
+                
+                if(typeof applyReadonlyUI === 'function') applyReadonlyUI();
+            } catch(err) {
+                alert("Error en adminObserveUser: " + err.message + "\n" + err.stack);
+                console.error(err);
+            }
+        }
+
+        // Firebase Auth Logic (Kiosk Mode)
         document.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                window.toggleTheme(true);
+            } else if (savedTheme === 'light') {
+                window.toggleTheme(false);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                window.toggleTheme(true);
+            }
+
             const loginScreen = document.getElementById('login-screen');
             const appContent = document.getElementById('app-content');
-            const btnLogin = document.getElementById('btn-login');
             const loginLoader = document.getElementById('login-loader');
+            const statusText = document.getElementById('login-status-text');
 
-            const btnSkipLogin = document.getElementById('btn-skip-login');
+            updatePinDots();
 
-            btnSkipLogin.addEventListener('click', async () => {
-                // Bypass login and use local storage directly
-                loginScreen.classList.add('opacity-0');
-                setTimeout(async () => {
-                    loginScreen.classList.add('hidden');
-                    appContent.classList.remove('opacity-0', 'pointer-events-none');
-                    // Manually fetch localStorage
-                    try {
-                        const storedShifts = localStorage.getItem('mjpro_shifts');
-                        if(storedShifts) allShifts = JSON.parse(storedShifts);
-                        const storedTasks = localStorage.getItem('mjpro_tasks');
-                        if(storedTasks) allTasks = JSON.parse(storedTasks);
-                        const storedSettings = localStorage.getItem('mjpro_settings');
-                        if(storedSettings) weekSettings = JSON.parse(storedSettings);
-                        const storedActive = localStorage.getItem('mjpro_active_shift');
-                        if(storedActive) currentShiftStart = new Date(parseInt(storedActive));
-                    } catch(e){}
-                    await initApp();
-                }, 500);
-            });
+            const savedUser = localStorage.getItem('kiosk_user');
+            if(savedUser) {
+                if(savedUser === 'admin') {
+                    document.getElementById('login-screen').classList.add('hidden', 'opacity-0', 'pointer-events-none');
+                    const adminDash = document.getElementById('admin-dashboard');
+                    adminDash.classList.remove('hidden');
+                    setTimeout(() => adminDash.classList.remove('opacity-0'), 50);
 
-            btnLogin.addEventListener('click', () => {
-                btnLogin.classList.add('hidden');
+                    openAdminDashboard();
+                } else {
+                    document.getElementById('login-screen').classList.add('hidden', 'opacity-0', 'pointer-events-none');
+                    document.getElementById('app-content').classList.remove('hidden');
+                    setTimeout(() => document.getElementById('app-content').classList.remove('opacity-0', 'pointer-events-none'), 50);
+                    currentKioskUser = savedUser;
+                    isReadonly = false;
+                    window.signInAnonymously(window.firebaseAuth).then(async () => {
+                        window.setupLogoutButton();
+                        await initApp();
+                    });
+                }
+            }
+
+            window.attemptLogin = async function() {
+                const username = document.getElementById('kiosk-username').value.trim().toLowerCase();
+                if(!username) return showToast("Ingresa tu usuario", true);
+                if(currentPin.length < 4) return showToast("PIN muy corto", true);
+
                 loginLoader.classList.remove('hidden');
-                
-                window.signInWithPopup(window.firebaseAuth, window.firebaseProvider).catch(error => {
-                    console.error(error);
-                    showToast("Error al iniciar sesión: " + error.message, true);
-                    btnLogin.classList.remove('hidden');
-                    loginLoader.classList.add('hidden');
-                });
-            });
+                statusText.innerText = "Verificando...";
 
-            // Listen to auth state
-            window.onAuthStateChanged(window.firebaseAuth, async (user) => {
-                if (user) {
-                    // User is signed in
-                    currentUser = user;
-                    await initApp();
+                try {
+                    // Admin check
+                    if(username === 'admin' && currentPin === '562400') {
+                        localStorage.setItem('kiosk_user', 'admin');
+                        loginLoader.classList.add('hidden');
+                        loginScreen.classList.add('hidden', 'opacity-0', 'pointer-events-none');
+                        
+                        const adminDash = document.getElementById('admin-dashboard');
+                        adminDash.classList.remove('hidden');
+                        setTimeout(() => adminDash.classList.remove('opacity-0'), 50);
+
+                        showToast("Bienvenido Administrador");
+                        openAdminDashboard();
+                        return;
+                    }
+
+                    // Kiosk Auth
+                    await window.signInAnonymously(window.firebaseAuth);
+                    const userDocRef = window.fsDoc(window.firebaseDb, "jornada_users", username);
+                    const snap = await window.fsGetDoc(userDocRef);
                     
-                    // Add logout button to navbar if not exists
-                    if (!document.getElementById('btn-logout')) {
-                        const navActions = document.querySelector('nav .flex.items-center.gap-2');
-                        if(navActions) {
-                            const btnLogout = document.createElement('button');
-                            btnLogout.id = 'btn-logout';
-                            btnLogout.className = 'w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-dark-bg text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shadow-sm border border-slate-200 dark:border-dark-border';
-                            btnLogout.innerHTML = '<i data-lucide="log-out" class="w-5 h-5"></i>';
-                            btnLogout.title = "Cerrar sesión";
-                            btnLogout.onclick = () => window.signOut(window.firebaseAuth);
-                            navActions.appendChild(btnLogout);
-                            lucide.createIcons();
+                    if(!snap.exists()) {
+                        // Temporal: Autocrear usuario si no existe (hasta que esté el Panel Admin)
+                        await window.fsSetDoc(userDocRef, { pin: currentPin, role: "employee" });
+                        showToast("Usuario creado automáticamente.");
+                    } else {
+                        const data = snap.data();
+                        if(data.pin !== currentPin) {
+                            throw new Error("PIN incorrecto.");
                         }
                     }
 
-                    // Hide login screen, show app
+                    // Success
+                    localStorage.setItem('kiosk_user', username);
+                    currentKioskUser = username;
+                    isReadonly = false;
+                    currentUser = window.firebaseAuth.currentUser; // needed for old functions temporarily
+                    
+                    setupLogoutButton();
+
                     loginScreen.classList.add('opacity-0');
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         loginScreen.classList.add('hidden');
+                        appContent.classList.remove('hidden');
                         appContent.classList.remove('opacity-0', 'pointer-events-none');
+                        
+                        const btnAdd = document.getElementById('btn-add-turno');
+                        if (btnAdd) btnAdd.style.display = 'flex';
+                        const btnEnd = document.getElementById('btn-end-shift');
+                        if (btnEnd) btnEnd.style.display = 'flex';
+                        
+                        await initApp();
                     }, 500);
-                } else {
-                    // User is signed out
-                    currentUser = null;
-                    appContent.classList.add('opacity-0', 'pointer-events-none');
-                    loginScreen.classList.remove('hidden');
-                    setTimeout(() => loginScreen.classList.remove('opacity-0'), 50);
-                    
-                    btnLogin.classList.remove('hidden');
+
+                } catch(e) {
+                    console.error(e);
+                    showToast(e.message, true);
+                    clearPin();
+                } finally {
                     loginLoader.classList.add('hidden');
-                    
-                    const logoutBtn = document.getElementById('btn-logout');
-                    if (logoutBtn) logoutBtn.remove();
                 }
-            });
-        });
+            }
+
+            window.applyReadonlyUI = function() {
+                const addBtn = document.getElementById('btn-add-turno');
+                if(addBtn) addBtn.style.display = 'none';
+                const endBtn = document.getElementById('btn-end-shift');
+                if(endBtn) endBtn.style.display = 'none';
+                
+                const tabManual = document.getElementById('tab-manual');
+                if(tabManual) tabManual.style.display = 'none';
+                
+                const rightCol = document.getElementById('col-right');
+                const historyCont = document.getElementById('history-container');
+                if(rightCol && historyCont) {
+                    Array.from(rightCol.children).forEach(c => {
+                        if(c.id !== 'history-container') c.style.display = 'none';
+                    });
+                    rightCol.appendChild(historyCont);
+                    rightCol.classList.remove('h-[850px]');
+                }
+            };
+
+            window.attemptReadonly = async function() {
+                const username = document.getElementById('kiosk-username').value.trim().toLowerCase();
+                if(!username) return showToast("Ingresa el usuario a consultar", true);
+
+                loginLoader.classList.remove('hidden');
+                statusText.innerText = "Cargando datos...";
+
+                try {
+                    await window.signInAnonymously(window.firebaseAuth);
+                    const userDocRef = window.fsDoc(window.firebaseDb, "jornada_users", username);
+                    const snap = await window.fsGetDoc(userDocRef);
+                    
+                    if(!snap.exists()) {
+                        throw new Error("Usuario no encontrado.");
+                    }
+
+                    // Success Readonly
+                    currentKioskUser = username;
+                    isReadonly = true;
+                    currentUser = window.firebaseAuth.currentUser;
+
+                    setupLogoutButton();
+                    
+                    loginScreen.classList.add('opacity-0');
+                    setTimeout(async () => {
+                        loginScreen.classList.add('hidden');
+                        appContent.classList.remove('hidden');
+                        appContent.classList.remove('opacity-0', 'pointer-events-none');
+                        
+                        await initApp();
+                        if(typeof applyReadonlyUI === 'function') applyReadonlyUI();
+                        
+                        showToast("Modo Visor Público (Solo lectura)");
+                    }, 500);
+
+                } catch(e) {
+                    showToast(e.message, true);
+                } finally {
+                    loginLoader.classList.add('hidden');
+                }
+            }
+
+        }); // end DOMContentLoaded
     </script>
 </body>
 </html>
