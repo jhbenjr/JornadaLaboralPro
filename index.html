@@ -423,7 +423,7 @@
                             <i data-lucide="list" class="w-5 h-5 mr-2 text-indigo-500"></i> Historial Semanal
                         </h2>
                         <div class="flex gap-2">
-                            <button onclick="clearShifts()" class="p-2.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-500/20" title="Limpiar Tabla">
+                            <button onclick="handleTripleClick(this, 'all', 'clearShifts')" class="p-2.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all transform origin-center border border-transparent hover:border-red-100 dark:hover:border-red-500/20" title="Limpiar Tabla (Presiona 3 veces)">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                             <button onclick="generateReport()" class="flex items-center px-4 py-2.5 bg-slate-100 dark:bg-dark-bg text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-dark-border text-sm font-semibold rounded-xl hover:bg-slate-200 dark:hover:bg-dark-hover transition-all duration-200 shadow-sm justify-center">
@@ -1571,7 +1571,7 @@
             // Find a task that: is today, is currently active (start <= now < end), ends in <= 10 min
             const todayTasks = [
                 ...allTasks.filter(t => t.weekId === currentWeekId && t.dayIdx === todayDay && !t.completed),
-                ...globalTasks.filter(g => g.dayIdx === todayDay)
+                ...globalTasks.filter(g => g.days ? g.days.includes(todayDay) : g.dayIdx === todayDay)
             ];
 
             const endingTask = todayTasks.find(t => {
@@ -1904,8 +1904,42 @@
             lucide.createIcons();
         }
 
-        window.deleteShift = function(dbId) {
-            if(!confirm('¿Estás seguro de que deseas eliminar este turno?')) return;
+        window.tripleClickState = {};
+        window.handleTripleClick = function(btn, id, actionFnName) {
+            const state = window.tripleClickState[id] || { count: 0, timer: null };
+            state.count++;
+            clearTimeout(state.timer);
+            
+            if (state.count === 1) {
+                btn.dataset.originalHtml = btn.innerHTML;
+                btn.dataset.originalClasses = btn.className;
+                
+                // Set warning colors removing the base background/text and opacity-hiding classes
+                btn.className = btn.dataset.originalClasses.replace(/text-slate-400|text-slate-500|bg-slate-50|bg-white|dark:bg-dark-card|dark:bg-dark-bg|hover:[^\s]+|sm:opacity-0|sm:group-hover:opacity-100|opacity-0/g, '').replace(/\s+/g, ' ').trim() + ' bg-red-500 text-white dark:bg-red-600 scale-105 opacity-100';
+                btn.innerHTML = `<div class="flex items-center justify-center w-full gap-0.5"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i><span class="text-[9px] font-black leading-none">x2</span></div>`;
+                lucide.createIcons();
+            } else if (state.count === 2) {
+                btn.innerHTML = `<div class="flex items-center justify-center w-full gap-0.5"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i><span class="text-[9px] font-black leading-none">x1</span></div>`;
+                btn.classList.add('scale-110');
+                lucide.createIcons();
+            } else if (state.count >= 3) {
+                delete window.tripleClickState[id];
+                window[actionFnName](id, true);
+                return;
+            }
+
+            window.tripleClickState[id] = state;
+            
+            state.timer = setTimeout(() => {
+                state.count = 0;
+                btn.className = btn.dataset.originalClasses;
+                btn.innerHTML = btn.dataset.originalHtml;
+                lucide.createIcons();
+            }, 2000);
+        };
+
+        window.deleteShift = function(dbId, force = false) {
+            if(!force && !confirm('¿Estás seguro de que deseas eliminar este turno?')) return;
             allShifts = allShifts.filter(s => s.dbId !== dbId);
             saveLocalData();
             renderData();
@@ -1979,11 +2013,11 @@
             showToast("Turno actualizado correctamente.");
         }
 
-        window.clearShifts = function(showNotification = true) {
+        window.clearShifts = function(id = 'all', force = false) {
             const weekShifts = allShifts.filter(s => s.weekId === currentWeekId);
             if(weekShifts.length === 0) return;
             
-            if(!confirm('¿Estás seguro de que deseas eliminar TODOS los turnos de esta semana? Esta acción no se puede deshacer.')) return;
+            if(!force && !confirm('¿Estás seguro de que deseas eliminar TODOS los turnos de esta semana? Esta acción no se puede deshacer.')) return;
 
             allShifts = allShifts.filter(s => s.weekId !== currentWeekId);
             saveLocalData();
@@ -2039,11 +2073,11 @@
                         <td class="px-5 py-4 text-right"><span class="px-2 py-1 rounded text-xs font-bold ${diffColor}">${diffStr}</span></td>
                         <td class="px-4 py-4 whitespace-nowrap text-right text-sm">
                             ${!isReadonly ? `
-                            <button onclick="editShift('${s.dbId}')" class="text-slate-400 hover:text-indigo-500 dark:text-slate-500 dark:hover:text-indigo-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all mr-3" title="Editar">
+                            <button onclick="editShift('${s.dbId}')" class="p-2 rounded-xl bg-slate-50 hover:bg-indigo-50 dark:bg-dark-bg dark:hover:bg-indigo-500/10 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-colors mr-2" title="Editar">
                                 <i data-lucide="edit-2" class="w-4 h-4"></i>
                             </button>
-                            <button onclick="deleteShift('${s.dbId}')" class="text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all" title="Eliminar">
-                                <i data-lucide="trash" class="w-4 h-4"></i>
+                            <button onclick="handleTripleClick(this, '${s.dbId}', 'deleteShift')" class="p-2 rounded-xl bg-slate-50 hover:bg-red-50 dark:bg-dark-bg dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all transform origin-center" title="Eliminar (Presiona 3 veces)">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                             ` : ''}
                         </td>
@@ -2120,7 +2154,7 @@
             for(const dayIdx of selectedDays) {
                 const taskData = { weekId: currentWeekId, desc, dayIdx, start, end, notes, completed: false, createdAt: Date.now() };
                 const oneTimeConflict = allTasks.find(t => t.weekId === currentWeekId && t.dayIdx === dayIdx && t.start < end && t.end > start);
-                const globalConflict = globalTasks.find(g => g.dayIdx === dayIdx && g.start < end && g.end > start);
+                const globalConflict = globalTasks.find(g => (g.days ? g.days.includes(dayIdx) : g.dayIdx === dayIdx) && g.start < end && g.end > start);
                 const conflict = oneTimeConflict || globalConflict;
                 if(conflict) {
                     // Save remaining days as pending
@@ -2213,7 +2247,7 @@
             // Re-check conflict with adjusted times
             const dayIdx = _pendingOneTimeTask.dayIdx;
             const oneTimeConflict = allTasks.find(t => t.weekId === currentWeekId && t.dayIdx === dayIdx && t.start < newEnd && t.end > newStart);
-            const globalConflict = globalTasks.find(g => g.dayIdx === dayIdx && g.start < newEnd && g.end > newStart);
+            const globalConflict = globalTasks.find(g => (g.days ? g.days.includes(dayIdx) : g.dayIdx === dayIdx) && g.start < newEnd && g.end > newStart);
 
             if(oneTimeConflict || globalConflict) {
                 document.getElementById('conflict-still-error').textContent = "Aún hay traslape. Ajusta el horario para continuar.";
@@ -2256,11 +2290,17 @@
                 container.innerHTML = `<p class="text-sm text-slate-400 dark:text-slate-500 text-center py-4 italic">No hay tareas fijas configuradas aún.</p>`;
                 return;
             }
-            const sorted = [...globalTasks].sort((a,b) => a.dayIdx - b.dayIdx || a.start.localeCompare(b.start));
-            container.innerHTML = sorted.map(g => `
+            const sorted = [...globalTasks].sort((a,b) => {
+                const aDay = a.days ? a.days[0] : a.dayIdx;
+                const bDay = b.days ? b.days[0] : b.dayIdx;
+                return aDay - bDay || a.start.localeCompare(b.start);
+            });
+            container.innerHTML = sorted.map(g => {
+                const daysStr = g.days ? g.days.map(d => daysMap[d]).join(', ') : daysMap[g.dayIdx];
+                return `
                 <div class="flex items-center gap-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-2xl px-4 py-3">
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold text-violet-500 dark:text-violet-400">${daysMap[g.dayIdx]} · ${g.start}–${g.end}</p>
+                        <p class="text-xs font-bold text-violet-500 dark:text-violet-400">${daysStr} · ${g.start}–${g.end}</p>
                         <p class="text-sm font-semibold text-slate-800 dark:text-white truncate">${g.desc}</p>
                         ${g.notes ? `<p class="text-xs text-slate-400 truncate">${g.notes}</p>` : ''}
                     </div>
@@ -2268,12 +2308,12 @@
                         <button onclick="editGlobalTask('${g.dbId}')" class="p-2 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors" title="Editar">
                             <i data-lucide="edit-2" class="w-4 h-4"></i>
                         </button>
-                        <button onclick="deleteGlobalTask('${g.dbId}')" class="p-2 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors" title="Eliminar">
+                        <button onclick="handleTripleClick(this, '${g.dbId}', 'deleteGlobalTask')" class="p-2 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-all transform origin-center" title="Eliminar (Presiona 3 veces)">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
             lucide.createIcons();
         }
 
@@ -2293,21 +2333,23 @@
             if(start >= end) { showToast("El inicio debe ser antes del fin.", true); return; }
 
             if(editId) {
-                // Edit mode: update single task (keep existing dayIdx if 1 day selected, or update it)
-                const dayIdx = selectedDays[0];
-                const conflict = globalTasks.find(g => g.dbId !== editId && g.dayIdx === dayIdx && g.start < end && g.end > start);
-                if(conflict) { showToast(`Choca con "${conflict.desc}" (${conflict.start}–${conflict.end}).`, true); return; }
-                const idx = globalTasks.findIndex(g => g.dbId === editId);
-                if(idx > -1) globalTasks[idx] = { ...globalTasks[idx], desc, dayIdx, start, end, notes };
-            } else {
-                // Create mode: one entry per selected day
+                // Edit mode
                 for(const dayIdx of selectedDays) {
-                    const conflict = globalTasks.find(g => g.dayIdx === dayIdx && g.start < end && g.end > start);
+                    const conflict = globalTasks.find(g => g.dbId !== editId && (g.days ? g.days.includes(dayIdx) : g.dayIdx === dayIdx) && g.start < end && g.end > start);
                     if(conflict) { showToast(`Choca con "${conflict.desc}" el ${daysMap[dayIdx]} (${conflict.start}–${conflict.end}).`, true); return; }
                 }
-                selectedDays.forEach(dayIdx => {
-                    globalTasks.push({ dbId: Date.now().toString() + dayIdx, desc, dayIdx, start, end, notes });
-                });
+                const idx = globalTasks.findIndex(g => g.dbId === editId);
+                if(idx > -1) {
+                    globalTasks[idx] = { ...globalTasks[idx], desc, days: selectedDays, start, end, notes };
+                    delete globalTasks[idx].dayIdx; // Remove legacy format
+                }
+            } else {
+                // Create mode
+                for(const dayIdx of selectedDays) {
+                    const conflict = globalTasks.find(g => (g.days ? g.days.includes(dayIdx) : g.dayIdx === dayIdx) && g.start < end && g.end > start);
+                    if(conflict) { showToast(`Choca con "${conflict.desc}" el ${daysMap[dayIdx]} (${conflict.start}–${conflict.end}).`, true); return; }
+                }
+                globalTasks.push({ dbId: Date.now().toString(), desc, days: selectedDays, start, end, notes });
             }
 
             saveLocalData();
@@ -2322,9 +2364,10 @@
             if(!g) return;
             document.getElementById('global-task-edit-id').value = g.dbId;
             document.getElementById('global-task-desc').value = g.desc;
-            // Highlight the correct day button
+            // Highlight the correct day buttons
+            const gDays = g.days || [g.dayIdx];
             document.querySelectorAll('.day-btn-global').forEach(b => {
-                if(parseInt(b.dataset.day) === g.dayIdx) {
+                if(gDays.includes(parseInt(b.dataset.day))) {
                     b.classList.add('selected', 'bg-violet-500', 'text-white', 'border-violet-500');
                     b.classList.remove('border-slate-200', 'dark:border-dark-border', 'text-slate-500', 'dark:text-slate-400');
                 } else {
@@ -2358,8 +2401,8 @@
             });
         }
 
-        window.deleteGlobalTask = function(id) {
-            if(!confirm('¿Eliminar esta tarea fija de todas las semanas?')) return;
+        window.deleteGlobalTask = function(id, force = false) {
+            if(!force && !confirm('¿Eliminar esta tarea fija de todas las semanas?')) return;
             globalTasks = globalTasks.filter(g => g.dbId !== id);
             saveLocalData();
             renderData();
@@ -2376,8 +2419,8 @@
             }
         }
         
-        window.deleteTask = function(dbId) {
-            if(!confirm('¿Estás seguro de que deseas eliminar esta tarea?')) return;
+        window.deleteTask = function(dbId, force = false) {
+            if(!force && !confirm('¿Estás seguro de que deseas eliminar esta tarea?')) return;
             allTasks = allTasks.filter(x => x.dbId !== dbId); 
             saveLocalData();
             renderData();
@@ -2522,7 +2565,13 @@
 
             // Merge global tasks (virtual instances for this week) + one-time tasks
             const weekTasks = allTasks.filter(t => t.weekId === currentWeekId);
-            const globalVirtual = globalTasks.map(g => ({ ...g, isGlobal: true }));
+            const globalVirtual = [];
+            globalTasks.forEach(g => {
+                const gDays = g.days || [g.dayIdx];
+                gDays.forEach(d => {
+                    globalVirtual.push({ ...g, dayIdx: d, isGlobal: true, originalDbId: g.dbId, dbId: g.dbId + '_' + d });
+                });
+            });
             const allVisible = [...weekTasks, ...globalVirtual];
 
             if(allVisible.length === 0) {
@@ -2627,7 +2676,7 @@
                             
                             <div class="flex flex-row items-center space-x-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity mt-1">
                                 ${t.isGlobal ? `
-                                <button onclick="editGlobalTask('${t.dbId}'); openGlobalTasksModal();" class="p-2 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/20 text-violet-500 transition-colors" title="Editar tarea fija">
+                                <button onclick="editGlobalTask('${t.originalDbId || t.dbId}'); openGlobalTasksModal();" class="p-2 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/20 text-violet-500 transition-colors" title="Editar tarea fija">
                                     <i data-lucide="settings-2" class="w-4 h-4"></i>
                                 </button>
                                 ` : `
@@ -2640,7 +2689,7 @@
                                 <button onclick="editTask('${t.dbId}')" class="p-2 rounded-xl bg-slate-50 hover:bg-indigo-50 dark:bg-dark-bg dark:hover:bg-indigo-500/10 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors" title="Editar">
                                     <i data-lucide="edit-2" class="w-4 h-4"></i>
                                 </button>
-                                <button onclick="deleteTask('${t.dbId}')" class="p-2 rounded-xl bg-slate-50 hover:bg-red-50 dark:bg-dark-bg dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors" title="Eliminar">
+                                <button onclick="handleTripleClick(this, '${t.dbId}', 'deleteTask')" class="p-2 rounded-xl bg-slate-50 hover:bg-red-50 dark:bg-dark-bg dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-all transform origin-center" title="Eliminar (Presiona 3 veces)">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                                 `}
@@ -3111,7 +3160,7 @@
                 const configBtn = document.querySelector('button[onclick="openConfigModal()"]');
                 if(configBtn) configBtn.style.display = 'none';
                 
-                const clearBtn = document.querySelector('button[onclick="clearShifts()"]');
+                const clearBtn = document.querySelector('button[onclick*="clearShifts"]');
                 if(clearBtn) clearBtn.style.display = 'none';
                 
                 const tabManual = document.getElementById('tab-manual');
