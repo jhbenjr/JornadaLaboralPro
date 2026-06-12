@@ -132,20 +132,20 @@
             </div>
             
             <div class="flex items-center space-x-3 sm:space-x-5">
-                <div class="hidden md:flex items-center space-x-4 bg-white/50 dark:bg-dark-card/50 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-slate-200/60 dark:border-dark-border shadow-sm">
-                    <div class="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-300">
+                <div class="flex items-center space-x-2 sm:space-x-4 bg-white/50 dark:bg-dark-card/50 backdrop-blur-md px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl border border-slate-200/60 dark:border-dark-border shadow-sm">
+                    <div class="hidden md:flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-300">
                         <i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i>
                         <span id="date-display" class="font-medium">--</span>
                     </div>
-                    <div class="w-px h-5 bg-slate-300/50 dark:bg-dark-border"></div>
+                    <div class="hidden md:block w-px h-5 bg-slate-300/50 dark:bg-dark-border"></div>
                     <div class="flex flex-col items-end justify-center group relative cursor-pointer" onclick="toggleTimezone()" title="Click para alternar entre El Salvador y Maryland">
-                        <div class="flex items-center space-x-2">
-                            <i data-lucide="clock" class="w-4 h-4 text-violet-500"></i>
-                            <span id="live-clock" class="text-lg font-bold tracking-wider text-slate-800 dark:text-white tabular-nums">00:00</span>
+                        <div class="flex items-center space-x-1.5 sm:space-x-2">
+                            <i data-lucide="clock" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-violet-500"></i>
+                            <span id="live-clock" class="text-base sm:text-lg font-bold tracking-wider text-slate-800 dark:text-white tabular-nums">00:00</span>
                         </div>
-                        <div class="text-[10px] font-semibold text-slate-400 dark:text-slate-500 -mt-1 flex items-center transition-colors group-hover:text-indigo-500">
+                        <div class="text-[9px] sm:text-[10px] font-semibold text-slate-400 dark:text-slate-500 -mt-0.5 sm:-mt-1 flex items-center transition-colors group-hover:text-indigo-500">
                             <span id="live-clock-md">00:00 MD</span>
-                            <i data-lucide="arrow-left-right" class="w-2.5 h-2.5 ml-1 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            <i data-lucide="arrow-left-right" class="hidden md:block w-2.5 h-2.5 ml-1 opacity-0 group-hover:opacity-100 transition-opacity"></i>
                         </div>
                     </div>
                 </div>
