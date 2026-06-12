@@ -440,7 +440,7 @@
                                         <th class="px-5 py-4 tracking-wider">Fecha</th>
                                         <th class="px-5 py-4 tracking-wider">Entrada</th>
                                         <th class="px-5 py-4 tracking-wider">Salida</th>
-                                        <th class="px-5 py-4 tracking-wider text-right">Neto</th>
+                                        <th class="px-5 py-4 tracking-wider text-right">Duración</th>
                                         <th class="px-5 py-4 tracking-wider text-right">Diferencia</th>
                                         <th class="px-4 py-4 w-10"></th>
                                     </tr>
@@ -454,8 +454,8 @@
                 </div>
             </div>
 
-            <div id="col-right" class="lg:col-span-5 flex flex-col h-[850px]">
-                <div class="bg-white dark:bg-dark-card rounded-3xl shadow-sm border border-slate-200/60 dark:border-dark-border flex flex-col h-full overflow-hidden transition-all duration-300">
+            <div id="col-right" class="lg:col-span-5 flex flex-col h-[650px] lg:h-auto lg:relative min-h-[600px]">
+                <div class="lg:absolute lg:inset-0 flex flex-col h-full bg-white dark:bg-dark-card rounded-3xl shadow-sm border border-slate-200/60 dark:border-dark-border overflow-hidden transition-all duration-300">
                     
                     <div class="p-6 border-b border-slate-100 dark:border-dark-border bg-gradient-to-b from-slate-50/50 to-white dark:from-dark-bg/50 dark:to-dark-card">
                         <div class="flex justify-between items-center mb-5">
@@ -485,16 +485,19 @@
                                 </datalist>
                             </div>
                             
-                            <div class="grid grid-cols-3 gap-2.5">
-                                <select id="task-day" class="col-span-1 px-3 py-2.5 bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-xl text-sm font-medium dark:text-white focus:ring-2 focus:ring-violet-500/50 outline-none transition-all cursor-pointer">
-                                    <option value="1">Lunes</option>
-                                    <option value="2">Martes</option>
-                                    <option value="3">Miércoles</option>
-                                    <option value="4">Jueves</option>
-                                    <option value="5">Viernes</option>
-                                    <option value="6">Sábado</option>
-                                    <option value="0">Domingo</option>
-                                </select>
+                            <div class="space-y-2">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Días</p>
+                                <div class="flex flex-wrap gap-1.5" id="task-days-picker">
+                                    <button type="button" data-day="1" onclick="toggleDayBtn(this, 'task')" class="day-btn-task px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Lun</button>
+                                    <button type="button" data-day="2" onclick="toggleDayBtn(this, 'task')" class="day-btn-task px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Mar</button>
+                                    <button type="button" data-day="3" onclick="toggleDayBtn(this, 'task')" class="day-btn-task px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Mié</button>
+                                    <button type="button" data-day="4" onclick="toggleDayBtn(this, 'task')" class="day-btn-task px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Jue</button>
+                                    <button type="button" data-day="5" onclick="toggleDayBtn(this, 'task')" class="day-btn-task px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Vie</button>
+                                    <button type="button" data-day="6" onclick="toggleDayBtn(this, 'task')" class="day-btn-task px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Sáb</button>
+                                    <button type="button" data-day="0" onclick="toggleDayBtn(this, 'task')" class="day-btn-task px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Dom</button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2.5">
                                 <div class="relative col-span-1 group">
                                     <i data-lucide="clock-3" class="w-3.5 h-3.5 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 z-10 pointer-events-none"></i>
                                     <input type="text" id="task-start" placeholder="Inicio..." class="w-full pl-8 pr-2 py-2.5 bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-xl text-sm font-medium dark:text-white focus:ring-2 focus:ring-violet-500/50 outline-none transition-all cursor-pointer" title="Inicio">
@@ -505,25 +508,23 @@
                                 </div>
                             </div>
                             
-                            <div class="relative group mt-2">
-                                <textarea id="task-notes" rows="2" placeholder="Añadir notas o detalles adicionales (opcional)..." class="w-full px-4 py-2.5 bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-violet-500/50 outline-none transition-all resize-none"></textarea>
-                            </div>
-                            
-                            <div class="flex gap-2 mt-1">
-                                <button onclick="addTask()" class="flex-1 bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 shadow-md flex justify-center items-center hover:-translate-y-0.5">
-                                    <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i> Individual
-                                </button>
-                                <button onclick="generateWeekTemplate(1)" title="Llenar 5 Días" class="px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm border border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 flex justify-center items-center">
-                                    <i data-lucide="calendar" class="w-4 h-4 mr-1"></i> 5D
-                                </button>
-                                <button onclick="generateWeekTemplate(2)" title="Llenar 6 Días" class="px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm border border-violet-200 dark:border-violet-500/30 text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 flex justify-center items-center">
-                                    <i data-lucide="calendar-days" class="w-4 h-4 mr-1"></i> 6D
-                                </button>
+                            <div class="flex items-start gap-2 mt-2">
+                                <div class="relative group flex-1">
+                                    <textarea id="task-notes" rows="2" placeholder="Notas o detalles (opcional)..." class="w-full h-[88px] px-4 py-2.5 bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-violet-500/50 outline-none transition-all resize-none custom-scroll"></textarea>
+                                </div>
+                                <div class="flex flex-col gap-2 shrink-0 h-[88px] w-12">
+                                    <button onclick="addTask()" class="flex-1 w-full bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white rounded-xl text-sm transition-all duration-300 shadow-md flex justify-center items-center hover:-translate-y-0.5" title="Agregar a esta semana">
+                                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                                    </button>
+                                    <button id="btn-manage-global-tasks" onclick="openGlobalTasksModal()" title="Gestionar Tareas Fijas" class="flex-1 w-full rounded-xl text-sm transition-all duration-300 shadow-sm border border-violet-200 dark:border-violet-500/30 text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 flex justify-center items-center hover:-translate-y-0.5">
+                                        <i data-lucide="repeat" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex-1 overflow-y-auto custom-scroll p-6 bg-slate-50/30 dark:bg-transparent">
+                    <div class="flex-1 overflow-y-auto h-0 custom-scroll p-6 bg-slate-50/30 dark:bg-transparent">
                         <div id="schedule-container" class="space-y-6">
                             <!-- JS Inject -->
                         </div>
@@ -532,6 +533,29 @@
             </div>
         </div>
     </main>
+
+    <!-- TASK ENDING SOON ALERT CARD -->
+    <div id="task-ending-soon-card" class="fixed bottom-6 right-6 z-[90] hidden transition-all duration-500 ease-out">
+        <div class="bg-white dark:bg-dark-card rounded-2xl shadow-2xl border-2 border-amber-400 dark:border-amber-500 p-4 w-72">
+            <div class="flex items-start gap-3">
+                <div class="shrink-0 w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center animate-bounce">
+                    <i data-lucide="alarm-clock" class="w-5 h-5 text-amber-500 dark:text-amber-400"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-[11px] font-bold text-amber-500 dark:text-amber-400 uppercase tracking-wider">Tarea terminando pronto</p>
+                    <p id="task-ending-name" class="text-sm font-bold text-slate-800 dark:text-white truncate mt-0.5">—</p>
+                    <div class="flex items-center gap-2 mt-1.5">
+                        <span class="text-xs text-slate-500 dark:text-slate-400">Termina a las</span>
+                        <span id="task-ending-time" class="text-xs font-bold text-slate-700 dark:text-white">—</span>
+                        <span id="task-ending-countdown" class="ml-auto text-xs font-black text-amber-500 dark:text-amber-400 tabular-nums">—</span>
+                    </div>
+                </div>
+                <button onclick="dismissEndingCard()" class="shrink-0 p-1 text-slate-300 hover:text-slate-500 dark:hover:text-slate-200 transition-colors mt-0.5">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div id="report-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-dark-card w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 border border-slate-200/60 dark:border-dark-border" id="report-modal-content">
@@ -641,6 +665,101 @@
                     <button onclick="closeTaskEditModal()" class="px-5 py-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-hover rounded-xl text-sm font-bold transition-colors">Cancelar</button>
                     <button onclick="saveEditedTask()" class="px-6 py-2.5 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white rounded-xl text-sm font-bold transition-all duration-300 flex items-center shadow-md shadow-indigo-500/20 hover:-translate-y-0.5">
                         <i data-lucide="save" class="w-4 h-4 mr-2"></i> Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GLOBAL TASKS MODAL -->
+    <div id="global-tasks-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-dark-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 border border-slate-200/60 dark:border-dark-border flex flex-col max-h-[90vh]">
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-dark-border flex justify-between items-center bg-slate-50 dark:bg-dark-bg shrink-0">
+                <h3 class="font-bold text-lg flex items-center text-slate-800 dark:text-white tracking-tight">
+                    <div class="p-1.5 bg-violet-500/10 rounded-lg mr-3 text-violet-600 dark:text-violet-400">
+                        <i data-lucide="repeat" class="w-5 h-5"></i>
+                    </div>
+                    Tareas Fijas Semanales
+                </h3>
+                <button onclick="closeGlobalTasksModal()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white bg-white dark:bg-dark-card rounded-full shadow-sm border border-slate-200 dark:border-dark-border transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto custom-scroll p-6 space-y-4 bg-white dark:bg-dark-card">
+                <!-- Form to add/edit global task -->
+                <div class="bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 rounded-2xl p-4 space-y-3">
+                    <p class="text-xs font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> <span id="global-task-form-title">Nueva tarea fija</span></p>
+                    <input type="hidden" id="global-task-edit-id">
+                    <input list="predefined-tasks" type="text" id="global-task-desc" placeholder="Descripción de la tarea..." class="w-full px-4 py-2.5 bg-white dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-violet-500/50 outline-none transition-all">
+                    <div class="space-y-2">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Días</p>
+                        <div class="flex flex-wrap gap-1.5" id="global-task-days-picker">
+                            <button type="button" data-day="1" onclick="toggleDayBtn(this, 'global')" class="day-btn-global px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Lun</button>
+                            <button type="button" data-day="2" onclick="toggleDayBtn(this, 'global')" class="day-btn-global px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Mar</button>
+                            <button type="button" data-day="3" onclick="toggleDayBtn(this, 'global')" class="day-btn-global px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Mié</button>
+                            <button type="button" data-day="4" onclick="toggleDayBtn(this, 'global')" class="day-btn-global px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Jue</button>
+                            <button type="button" data-day="5" onclick="toggleDayBtn(this, 'global')" class="day-btn-global px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Vie</button>
+                            <button type="button" data-day="6" onclick="toggleDayBtn(this, 'global')" class="day-btn-global px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Sáb</button>
+                            <button type="button" data-day="0" onclick="toggleDayBtn(this, 'global')" class="day-btn-global px-2.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:text-violet-600 transition-all">Dom</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div class="relative group">
+                            <i data-lucide="clock-3" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none"></i>
+                            <input type="text" id="global-task-start" placeholder="Inicio" class="w-full pl-8 pr-2 py-2.5 bg-white dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-violet-500/50 outline-none transition-all cursor-pointer">
+                        </div>
+                        <div class="relative group">
+                            <i data-lucide="clock-9" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none"></i>
+                            <input type="text" id="global-task-end" placeholder="Fin" class="w-full pl-8 pr-2 py-2.5 bg-white dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-violet-500/50 outline-none transition-all cursor-pointer">
+                        </div>
+                    </div>
+                    <textarea id="global-task-notes" rows="2" placeholder="Notas (opcional)..." class="w-full px-4 py-2.5 bg-white dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-violet-500/50 outline-none transition-all resize-none"></textarea>
+                    <div class="flex gap-2">
+                        <button onclick="saveGlobalTask()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4"></i> Guardar tarea fija
+                        </button>
+                        <button onclick="cancelGlobalTaskEdit()" id="btn-cancel-global-edit" class="hidden px-4 py-2.5 rounded-xl text-sm font-bold border border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-dark-hover transition-all">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- List of existing global tasks -->
+                <div id="global-tasks-list" class="space-y-2">
+                    <!-- populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFLICT RESOLUTION MODAL -->
+    <div id="conflict-modal" class="fixed inset-0 bg-slate-900/50 dark:bg-black/70 backdrop-blur-sm z-[120] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-dark-card w-full max-w-md rounded-3xl shadow-2xl border border-slate-200/60 dark:border-dark-border overflow-hidden">
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-dark-border flex items-center gap-3 bg-amber-50 dark:bg-amber-500/10">
+                <div class="p-1.5 bg-amber-500/20 rounded-lg text-amber-600 dark:text-amber-400">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                </div>
+                <h3 class="font-bold text-lg text-slate-800 dark:text-white tracking-tight">Conflicto de horario</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-slate-600 dark:text-slate-300">La tarea que intentas agregar choca con <strong id="conflict-task-name" class="text-slate-800 dark:text-white"></strong>. Define el orden para ese día:</p>
+                <div id="conflict-details" class="bg-slate-50 dark:bg-dark-bg rounded-2xl border border-slate-200 dark:border-dark-border p-4 space-y-2 text-sm"></div>
+                <div class="space-y-2">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Ajusta el horario de tu nueva tarea:</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="relative group">
+                            <label class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 block">Nuevo inicio</label>
+                            <input type="text" id="conflict-new-start" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-amber-500/50 outline-none cursor-pointer">
+                        </div>
+                        <div class="relative group">
+                            <label class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 block">Nuevo fin</label>
+                            <input type="text" id="conflict-new-end" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-amber-500/50 outline-none cursor-pointer">
+                        </div>
+                    </div>
+                    <p id="conflict-still-error" class="text-xs text-red-500 font-semibold hidden">Aún hay traslape. Ajusta el horario para continuar.</p>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="closeConflictModal()" class="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold border border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-dark-hover transition-all">Cancelar</button>
+                    <button onclick="resolveConflict()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="check" class="w-4 h-4"></i> Confirmar y guardar
                     </button>
                 </div>
             </div>
@@ -861,7 +980,8 @@
             }
         });
         let allShifts = [];
-        let allTasks = [];
+        let allTasks = [];       // One-time tasks (per weekId)
+        let globalTasks = [];    // Recurring tasks (same every week)
         let weekSettings = {};
         let currentShiftStart = null;
         let isDarkMode = false;
@@ -892,6 +1012,7 @@
                             const data = docSnap.data();
                             allShifts = data.shifts || [];
                             allTasks = data.tasks || [];
+                            globalTasks = data.globalTasks || [];
                             weekSettings = data.settings || {};
                             currentShiftStart = data.activeShift ? new Date(data.activeShift) : null;
                             
@@ -942,6 +1063,7 @@
                 const payload = {
                     shifts: allShifts,
                     tasks: allTasks,
+                    globalTasks: globalTasks,
                     settings: weekSettings,
                     activeShift: currentShiftStart ? currentShiftStart.getTime() : null,
                     lastUpdated: new Date().toISOString()
@@ -1127,7 +1249,14 @@
         }
 
         async function initApp() {
-            document.getElementById('task-day').value = new Date().getDay().toString();
+            // Pre-select today in the day toggle buttons
+            const todayIdx = new Date().getDay();
+            document.querySelectorAll('.day-btn-task').forEach(b => {
+                if(parseInt(b.dataset.day) === todayIdx) {
+                    b.classList.add('selected', 'bg-violet-500', 'text-white', 'border-violet-500');
+                    b.classList.remove('border-slate-200', 'dark:border-dark-border', 'text-slate-500', 'dark:text-slate-400');
+                }
+            });
             
             flatpickr.localize(flatpickr.l10ns.es);
             flatpickr.l10ns.default.firstDayOfWeek = 1;
@@ -1162,11 +1291,21 @@
             flatpickr("#edit-out", timeConfig);
             flatpickr("#edit-task-start", timeConfig);
             flatpickr("#edit-task-end", timeConfig);
+            flatpickr("#global-task-start", timeConfig);
+            flatpickr("#global-task-end", timeConfig);
+            flatpickr("#conflict-new-start", timeConfig);
+            flatpickr("#conflict-new-end", timeConfig);
 
             document.getElementById('task-desc').addEventListener('input', function(e) {
                 if (e.target.value.toLowerCase().includes('almuerzo')) {
                     document.getElementById('task-start')._flatpickr.setDate('13:00');
                     document.getElementById('task-end')._flatpickr.setDate('13:50');
+                }
+            });
+            document.getElementById('global-task-desc').addEventListener('input', function(e) {
+                if (e.target.value.toLowerCase().includes('almuerzo')) {
+                    document.getElementById('global-task-start')._flatpickr.setDate('13:00');
+                    document.getElementById('global-task-end')._flatpickr.setDate('13:50');
                 }
             });
 
@@ -1423,11 +1562,63 @@
                     totalSumEl.textContent = formatDecimalHours(total);
                 }
             }
+
+            // ── Task ending-soon check ───────────────────────
+            const todayDay = new Date().getDay();
+            const todayHHMM = new Date().toLocaleTimeString('es-SV', { hour: '2-digit', minute: '2-digit', hour12: false });
+            const nowMinutes = parseInt(todayHHMM.split(':')[0]) * 60 + parseInt(todayHHMM.split(':')[1]);
+
+            // Find a task that: is today, is currently active (start <= now < end), ends in <= 10 min
+            const todayTasks = [
+                ...allTasks.filter(t => t.weekId === currentWeekId && t.dayIdx === todayDay && !t.completed),
+                ...globalTasks.filter(g => g.dayIdx === todayDay)
+            ];
+
+            const endingTask = todayTasks.find(t => {
+                const endH = parseInt(t.end.split(':')[0]);
+                const endM = parseInt(t.end.split(':')[1]);
+                const endMinutes = endH * 60 + endM;
+                const startH = parseInt(t.start.split(':')[0]);
+                const startM = parseInt(t.start.split(':')[1]);
+                const startMinutes = startH * 60 + startM;
+                const remaining = endMinutes - nowMinutes;
+                return nowMinutes >= startMinutes && remaining > 0 && remaining <= 10;
+            });
+
+            const alertCard = document.getElementById('task-ending-soon-card');
+            if(alertCard && !alertCard._dismissed) {
+                if(endingTask) {
+                    const endH = parseInt(endingTask.end.split(':')[0]);
+                    const endM = parseInt(endingTask.end.split(':')[1]);
+                    const remaining = (endH * 60 + endM) - nowMinutes;
+                    document.getElementById('task-ending-name').textContent = endingTask.desc;
+                    document.getElementById('task-ending-time').textContent = endingTask.end;
+                    document.getElementById('task-ending-countdown').textContent = `${remaining} min restante${remaining !== 1 ? 's' : ''}`;
+                    if(alertCard._lastTask !== endingTask.dbId) {
+                        alertCard._dismissed = false;
+                        alertCard._lastTask = endingTask.dbId;
+                    }
+                    alertCard.classList.remove('hidden');
+                    lucide.createIcons({ elements: [alertCard] });
+                } else {
+                    // Reset dismissed state when no task is ending
+                    if(alertCard._lastTask) {
+                        alertCard._lastTask = null;
+                        alertCard._dismissed = false;
+                    }
+                    alertCard.classList.add('hidden');
+                }
+            }
         }
 
         function formatHHMM(date) { return date.toLocaleTimeString('es-SV', { hour: '2-digit', minute: '2-digit', hour12: false }); }
         function formatShortDate(date) { return date.toLocaleDateString('es-SV', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
         function getDayName(date) { return date.toLocaleDateString('es-SV', { weekday: 'short' }).toUpperCase(); }
+
+        window.dismissEndingCard = function() {
+            const card = document.getElementById('task-ending-soon-card');
+            if(card) { card._dismissed = true; card.classList.add('hidden'); }
+        }
         function formatDecimalHours(decimal) {
             const h = Math.floor(decimal);
             const m = Math.round((decimal - h) * 60);
@@ -1901,9 +2092,16 @@
             lucide.createIcons();
         }
 
+        // Pending one-time task data for conflict resolution
+        let _pendingOneTimeTask = null;
+
         window.addTask = function() {
             const desc = document.getElementById('task-desc').value.trim();
-            const dayIdx = parseInt(document.getElementById('task-day').value);
+            // Collect selected days from toggle buttons
+            const selectedDayBtns = document.querySelectorAll('#task-days-picker .day-btn-task.selected');
+            const selectedDays = Array.from(selectedDayBtns).map(b => parseInt(b.dataset.day));
+            if(selectedDays.length === 0) { showToast("Selecciona al menos un día.", true); return; }
+
             let start = document.getElementById('task-start').value;
             let end = document.getElementById('task-end').value;
             const notes = document.getElementById('task-notes').value.trim();
@@ -1914,27 +2112,259 @@
             if(!desc || !start || !end) {
                 showToast("Faltan detalles en la tarea.", true); return;
             }
-
-            const overlap = allTasks.some(t => t.weekId === currentWeekId && t.dayIdx === dayIdx && t.start < end && t.end > start);
-            if(overlap) {
-                showToast("Ya existe una tarea programada en ese horario.", true); return;
+            if(start >= end) {
+                showToast("El inicio debe ser antes del fin.", true); return;
             }
 
-            const taskData = {
-                weekId: currentWeekId,
-                desc, dayIdx, start, end, notes,
-                completed: false, createdAt: Date.now()
-            };
+            // For multi-day: check conflict on each day — open conflict modal for first conflict found
+            for(const dayIdx of selectedDays) {
+                const taskData = { weekId: currentWeekId, desc, dayIdx, start, end, notes, completed: false, createdAt: Date.now() };
+                const oneTimeConflict = allTasks.find(t => t.weekId === currentWeekId && t.dayIdx === dayIdx && t.start < end && t.end > start);
+                const globalConflict = globalTasks.find(g => g.dayIdx === dayIdx && g.start < end && g.end > start);
+                const conflict = oneTimeConflict || globalConflict;
+                if(conflict) {
+                    // Save remaining days as pending
+                    _pendingOneTimeTask = taskData;
+                    _pendingRemainingDays = selectedDays.filter(d => d !== dayIdx);
+                    openConflictModal(conflict, taskData);
+                    return;
+                }
+            }
 
-            allTasks.push({ dbId: Date.now().toString(), ...taskData });
+            // No conflicts on any day — save all
+            selectedDays.forEach(dayIdx => {
+                const taskData = { weekId: currentWeekId, desc, dayIdx, start, end, notes, completed: false, createdAt: Date.now() + dayIdx };
+                allTasks.push({ dbId: Date.now().toString() + dayIdx, ...taskData });
+            });
             saveLocalData();
             renderData();
+            clearOneTimeForm();
+            showToast(`Tarea agendada en ${selectedDays.length} día${selectedDays.length > 1 ? 's' : ''}.`);
+        }
 
+        // Track remaining days when conflict interrupted multi-day add
+        let _pendingRemainingDays = [];
+
+        function clearOneTimeForm() {
             document.getElementById('task-desc').value = '';
-            document.getElementById('task-start').value = '';
-            document.getElementById('task-end').value = '';
+            if(document.getElementById('task-start')._flatpickr) document.getElementById('task-start')._flatpickr.clear();
+            else document.getElementById('task-start').value = '';
+            if(document.getElementById('task-end')._flatpickr) document.getElementById('task-end')._flatpickr.clear();
+            else document.getElementById('task-end').value = '';
             document.getElementById('task-notes').value = '';
-            showToast("Bloque agendado.");
+            // Clear day selections
+            document.querySelectorAll('.day-btn-task.selected').forEach(b => {
+                b.classList.remove('selected', 'bg-violet-500', 'text-white', 'border-violet-500');
+                b.classList.add('border-slate-200', 'dark:border-dark-border', 'text-slate-500', 'dark:text-slate-400');
+            });
+        }
+
+        // ── Day toggle buttons ────────────────────────────────────────────────
+        window.toggleDayBtn = function(btn, scope) {
+            const isSelected = btn.classList.contains('selected');
+            if(isSelected) {
+                btn.classList.remove('selected', 'bg-violet-500', 'text-white', 'border-violet-500');
+                btn.classList.add('border-slate-200', 'dark:border-dark-border', 'text-slate-500', 'dark:text-slate-400');
+            } else {
+                btn.classList.add('selected', 'bg-violet-500', 'text-white', 'border-violet-500');
+                btn.classList.remove('border-slate-200', 'dark:border-dark-border', 'text-slate-500', 'dark:text-slate-400');
+            }
+        }
+
+        // ── Conflict modal ────────────────────────────────────────────────────
+        function openConflictModal(conflicting, pending) {
+            const modal = document.getElementById('conflict-modal');
+            const mc = modal.querySelector('div.bg-white, div.dark\\:bg-dark-card') || modal.querySelector('div');
+
+            document.getElementById('conflict-task-name').textContent = `"${conflicting.desc}" (${conflicting.start}–${conflicting.end})`;
+            document.getElementById('conflict-details').innerHTML = `
+                <div class="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Tarea en conflicto</div>
+                <div class="pl-6 text-slate-700 dark:text-slate-300">📌 <strong>${conflicting.desc}</strong> — ${conflicting.start} a ${conflicting.end} (${daysMap[conflicting.dayIdx]})</div>
+                <div class="pl-6 text-indigo-600 dark:text-indigo-400">➕ <strong>${pending.desc}</strong> — ${pending.start} a ${pending.end} (${daysMap[pending.dayIdx]})</div>
+            `;
+            document.getElementById('conflict-new-start').value = pending.start;
+            document.getElementById('conflict-new-end').value = pending.end;
+            document.getElementById('conflict-still-error').classList.add('hidden');
+
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+            });
+            lucide.createIcons();
+        }
+
+        window.closeConflictModal = function() {
+            const modal = document.getElementById('conflict-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); _pendingOneTimeTask = null; }, 300);
+        }
+
+        window.resolveConflict = function() {
+            if(!_pendingOneTimeTask) return;
+            const newStart = document.getElementById('conflict-new-start').value.trim();
+            const newEnd = document.getElementById('conflict-new-end').value.trim();
+
+            if(!newStart || !newEnd || newStart >= newEnd) {
+                document.getElementById('conflict-still-error').textContent = "Horario inválido. El inicio debe ser antes del fin.";
+                document.getElementById('conflict-still-error').classList.remove('hidden');
+                return;
+            }
+
+            // Re-check conflict with adjusted times
+            const dayIdx = _pendingOneTimeTask.dayIdx;
+            const oneTimeConflict = allTasks.find(t => t.weekId === currentWeekId && t.dayIdx === dayIdx && t.start < newEnd && t.end > newStart);
+            const globalConflict = globalTasks.find(g => g.dayIdx === dayIdx && g.start < newEnd && g.end > newStart);
+
+            if(oneTimeConflict || globalConflict) {
+                document.getElementById('conflict-still-error').textContent = "Aún hay traslape. Ajusta el horario para continuar.";
+                document.getElementById('conflict-still-error').classList.remove('hidden');
+                return;
+            }
+
+            const finalTask = { ..._pendingOneTimeTask, start: newStart, end: newEnd };
+            allTasks.push({ dbId: Date.now().toString(), ...finalTask });
+            saveLocalData();
+            renderData();
+            clearOneTimeForm();
+            closeConflictModal();
+            showToast("Tarea agendada sin conflictos.");
+        }
+
+        // ── Global Tasks CRUD ─────────────────────────────────────────────────
+        window.openGlobalTasksModal = function() {
+            cancelGlobalTaskEdit();
+            renderGlobalTasksList();
+            const modal = document.getElementById('global-tasks-modal');
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            });
+            lucide.createIcons();
+        }
+
+        window.closeGlobalTasksModal = function() {
+            const modal = document.getElementById('global-tasks-modal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function renderGlobalTasksList() {
+            const container = document.getElementById('global-tasks-list');
+            if(globalTasks.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-400 dark:text-slate-500 text-center py-4 italic">No hay tareas fijas configuradas aún.</p>`;
+                return;
+            }
+            const sorted = [...globalTasks].sort((a,b) => a.dayIdx - b.dayIdx || a.start.localeCompare(b.start));
+            container.innerHTML = sorted.map(g => `
+                <div class="flex items-center gap-3 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-2xl px-4 py-3">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold text-violet-500 dark:text-violet-400">${daysMap[g.dayIdx]} · ${g.start}–${g.end}</p>
+                        <p class="text-sm font-semibold text-slate-800 dark:text-white truncate">${g.desc}</p>
+                        ${g.notes ? `<p class="text-xs text-slate-400 truncate">${g.notes}</p>` : ''}
+                    </div>
+                    <div class="flex gap-1.5 shrink-0">
+                        <button onclick="editGlobalTask('${g.dbId}')" class="p-2 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors" title="Editar">
+                            <i data-lucide="edit-2" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteGlobalTask('${g.dbId}')" class="p-2 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors" title="Eliminar">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.saveGlobalTask = function() {
+            const editId = document.getElementById('global-task-edit-id').value;
+            const desc = document.getElementById('global-task-desc').value.trim();
+            // Collect selected day buttons
+            const selectedGlobalBtns = document.querySelectorAll('#global-task-days-picker .day-btn-global.selected');
+            const selectedDays = Array.from(selectedGlobalBtns).map(b => parseInt(b.dataset.day));
+            if(selectedDays.length === 0) { showToast("Selecciona al menos un día.", true); return; }
+
+            let start = document.getElementById('global-task-start').value.trim();
+            let end = document.getElementById('global-task-end').value.trim();
+            const notes = document.getElementById('global-task-notes').value.trim();
+
+            if(!desc || !start || !end) { showToast("Completa todos los campos.", true); return; }
+            if(start >= end) { showToast("El inicio debe ser antes del fin.", true); return; }
+
+            if(editId) {
+                // Edit mode: update single task (keep existing dayIdx if 1 day selected, or update it)
+                const dayIdx = selectedDays[0];
+                const conflict = globalTasks.find(g => g.dbId !== editId && g.dayIdx === dayIdx && g.start < end && g.end > start);
+                if(conflict) { showToast(`Choca con "${conflict.desc}" (${conflict.start}–${conflict.end}).`, true); return; }
+                const idx = globalTasks.findIndex(g => g.dbId === editId);
+                if(idx > -1) globalTasks[idx] = { ...globalTasks[idx], desc, dayIdx, start, end, notes };
+            } else {
+                // Create mode: one entry per selected day
+                for(const dayIdx of selectedDays) {
+                    const conflict = globalTasks.find(g => g.dayIdx === dayIdx && g.start < end && g.end > start);
+                    if(conflict) { showToast(`Choca con "${conflict.desc}" el ${daysMap[dayIdx]} (${conflict.start}–${conflict.end}).`, true); return; }
+                }
+                selectedDays.forEach(dayIdx => {
+                    globalTasks.push({ dbId: Date.now().toString() + dayIdx, desc, dayIdx, start, end, notes });
+                });
+            }
+
+            saveLocalData();
+            renderData();
+            renderGlobalTasksList();
+            cancelGlobalTaskEdit();
+            showToast(editId ? "Tarea fija actualizada." : `Tarea fija creada en ${selectedDays.length} día${selectedDays.length > 1 ? 's' : ''}.`);
+        }
+
+        window.editGlobalTask = function(id) {
+            const g = globalTasks.find(x => x.dbId === id);
+            if(!g) return;
+            document.getElementById('global-task-edit-id').value = g.dbId;
+            document.getElementById('global-task-desc').value = g.desc;
+            // Highlight the correct day button
+            document.querySelectorAll('.day-btn-global').forEach(b => {
+                if(parseInt(b.dataset.day) === g.dayIdx) {
+                    b.classList.add('selected', 'bg-violet-500', 'text-white', 'border-violet-500');
+                    b.classList.remove('border-slate-200', 'dark:border-dark-border', 'text-slate-500', 'dark:text-slate-400');
+                } else {
+                    b.classList.remove('selected', 'bg-violet-500', 'text-white', 'border-violet-500');
+                    b.classList.add('border-slate-200', 'dark:border-dark-border', 'text-slate-500', 'dark:text-slate-400');
+                }
+            });
+            const gs = document.getElementById('global-task-start');
+            const ge = document.getElementById('global-task-end');
+            if(gs._flatpickr) gs._flatpickr.setDate(g.start); else gs.value = g.start;
+            if(ge._flatpickr) ge._flatpickr.setDate(g.end); else ge.value = g.end;
+            document.getElementById('global-task-notes').value = g.notes || '';
+            document.getElementById('global-task-form-title').textContent = 'Editando tarea fija';
+            document.getElementById('btn-cancel-global-edit').classList.remove('hidden');
+        }
+
+        window.cancelGlobalTaskEdit = function() {
+            document.getElementById('global-task-edit-id').value = '';
+            document.getElementById('global-task-desc').value = '';
+            const gs = document.getElementById('global-task-start');
+            const ge = document.getElementById('global-task-end');
+            if(gs._flatpickr) gs._flatpickr.clear(); else gs.value = '';
+            if(ge._flatpickr) ge._flatpickr.clear(); else ge.value = '';
+            document.getElementById('global-task-notes').value = '';
+            document.getElementById('global-task-form-title').textContent = 'Nueva tarea fija';
+            document.getElementById('btn-cancel-global-edit').classList.add('hidden');
+            // Deselect all day buttons
+            document.querySelectorAll('.day-btn-global.selected').forEach(b => {
+                b.classList.remove('selected', 'bg-violet-500', 'text-white', 'border-violet-500');
+                b.classList.add('border-slate-200', 'dark:border-dark-border', 'text-slate-500', 'dark:text-slate-400');
+            });
+        }
+
+        window.deleteGlobalTask = function(id) {
+            if(!confirm('¿Eliminar esta tarea fija de todas las semanas?')) return;
+            globalTasks = globalTasks.filter(g => g.dbId !== id);
+            saveLocalData();
+            renderData();
+            renderGlobalTasksList();
+            showToast("Tarea fija eliminada.");
         }
 
         window.toggleTask = function(dbId) {
@@ -2089,9 +2519,13 @@
         function renderTasks() {
             const container = document.getElementById('schedule-container');
             container.innerHTML = '';
-            const weekTasks = allTasks.filter(t => t.weekId === currentWeekId);
 
-            if(weekTasks.length === 0) {
+            // Merge global tasks (virtual instances for this week) + one-time tasks
+            const weekTasks = allTasks.filter(t => t.weekId === currentWeekId);
+            const globalVirtual = globalTasks.map(g => ({ ...g, isGlobal: true }));
+            const allVisible = [...weekTasks, ...globalVirtual];
+
+            if(allVisible.length === 0) {
                 container.innerHTML = `
                     <div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 py-16">
                         <div class="w-16 h-16 bg-slate-100 dark:bg-dark-border rounded-full flex items-center justify-center mb-4">
@@ -2103,7 +2537,7 @@
             }
 
             const grouped = {};
-            weekTasks.forEach(t => {
+            allVisible.forEach(t => {
                 if(!grouped[t.dayIdx]) grouped[t.dayIdx] = [];
                 grouped[t.dayIdx].push(t);
             });
@@ -2175,7 +2609,7 @@
                     }
 
                     html += `
-                        <div class="relative group bg-white dark:bg-dark-card p-4 rounded-2xl border border-slate-200/60 dark:border-dark-border shadow-sm flex items-start justify-between transition-all duration-300 ${taskClass}">
+                        <div class="relative group bg-white dark:bg-dark-card p-4 rounded-2xl border ${t.isGlobal ? 'border-violet-200/60 dark:border-violet-500/20' : 'border-slate-200/60 dark:border-dark-border'} shadow-sm flex items-start justify-between transition-all duration-300 ${taskClass}">
                             
                             <div class="absolute -left-[27px] top-[24px] transform -translate-y-1/2 w-3.5 h-3.5 rounded-full border-[3px] border-slate-50 dark:border-dark-bg ${dotClass}"></div>
                             
@@ -2185,12 +2619,18 @@
                                         <i data-lucide="clock" class="w-3.5 h-3.5"></i>
                                         <span>${renderTaskTimeHTML(t.start, t.end)}</span>
                                     </div>
+                                    ${t.isGlobal ? '<span class="px-1.5 py-0.5 bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 rounded-md text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"><i data-lucide="repeat" class="w-2.5 h-2.5"></i> Fija</span>' : ''}
                                 </div>
                                 <p class="text-[15px] font-semibold break-words leading-snug ${t.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}">${t.desc}</p>
                                 ${t.notes ? `<p class="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-start"><i data-lucide="align-left" class="w-3.5 h-3.5 mr-1.5 mt-0.5 flex-shrink-0"></i> <span class="leading-relaxed break-words">${t.notes}</span></p>` : ''}
                             </div>
                             
                             <div class="flex flex-row items-center space-x-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity mt-1">
+                                ${t.isGlobal ? `
+                                <button onclick="editGlobalTask('${t.dbId}'); openGlobalTasksModal();" class="p-2 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/20 text-violet-500 transition-colors" title="Editar tarea fija">
+                                    <i data-lucide="settings-2" class="w-4 h-4"></i>
+                                </button>
+                                ` : `
                                 <button onclick="toggleTask('${t.dbId}')" class="p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 dark:bg-dark-bg dark:hover:bg-emerald-500/10 text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors" title="Completar">
                                     <i data-lucide="check" class="w-4 h-4"></i>
                                 </button>
@@ -2203,6 +2643,7 @@
                                 <button onclick="deleteTask('${t.dbId}')" class="p-2 rounded-xl bg-slate-50 hover:bg-red-50 dark:bg-dark-bg dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors" title="Eliminar">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
+                                `}
                             </div>
                         </div>
                     `;
@@ -2228,7 +2669,7 @@
                     report += `📅 ${s.dateStr}\n`;
                     report += `   Entrada:  ${s.in}\n`;
                     report += `   Salida:   ${s.out}\n`;
-                    report += `   Neto:     ${formatDecimalHours(s.duration)} hrs\n`;
+                    report += `   Duración: ${formatDecimalHours(s.duration)} hrs\n`;
                     report += `------------------------------------------\n`;
                     total += s.duration;
                 });
