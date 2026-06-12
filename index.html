@@ -178,6 +178,9 @@
                 </svg>
                 Continuar con Google
             </button>
+            <button id="btn-skip-login" class="w-full mt-3 bg-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 px-4 py-2 rounded-xl text-sm font-medium transition-all">
+                Continuar sin conexión (Modo Local)
+            </button>
 
             <div id="login-loader" class="hidden mt-4 text-indigo-500">
                 <i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i>
@@ -185,7 +188,7 @@
         </div>
     </div>
 
-    <main id="app-content" class="w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 p-4 sm:p-6 opacity-0 transition-opacity duration-500 pointer-events-none">
+    <main id="app-content" class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8 flex-1 w-full opacity-0 transition-opacity duration-500 pointer-events-none">
         
         <div class="bg-white dark:bg-dark-card rounded-3xl shadow-sm border border-slate-200/60 dark:border-dark-border p-6 sm:p-8 transition-all duration-300 w-full">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -581,6 +584,24 @@
                     <p class="text-[11px] text-slate-400 mt-2 italic" id="config-mode-desc">5 Días: Lunes a Jueves 10h, Viernes 8h.</p>
                 </div>
 
+                <!-- Datos y Respaldos -->
+                <div class="pt-4 border-t border-slate-100 dark:border-dark-border">
+                    <h4 class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i data-lucide="database" class="w-4 h-4 text-slate-400"></i> Respaldos
+                    </h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="exportDataToFile()" class="p-3 rounded-xl border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-dark-hover flex flex-col items-center justify-center gap-2 transition-colors">
+                            <i data-lucide="download" class="w-5 h-5 text-indigo-500"></i>
+                            <span class="text-xs font-bold text-slate-700 dark:text-white">Exportar</span>
+                        </button>
+                        <button onclick="document.getElementById('import-file').click()" class="p-3 rounded-xl border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-dark-hover flex flex-col items-center justify-center gap-2 transition-colors">
+                            <i data-lucide="upload" class="w-5 h-5 text-indigo-500"></i>
+                            <span class="text-xs font-bold text-slate-700 dark:text-white">Importar</span>
+                            <input type="file" id="import-file" accept=".json" class="hidden" onchange="importDataFromFile(event)">
+                        </button>
+                    </div>
+                </div>
+
                 <div class="mt-6 flex justify-end space-x-3 pt-2">
                     <button onclick="closeConfigModal()" class="px-5 py-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-hover rounded-xl text-sm font-bold transition-colors">Cancelar</button>
                     <button onclick="saveConfig()" class="px-6 py-2.5 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white rounded-xl text-sm font-bold transition-all duration-300 flex items-center shadow-md shadow-indigo-500/20 hover:-translate-y-0.5">
@@ -610,6 +631,7 @@
                         <span class="text-xs uppercase tracking-wider">Días</span>
                     </button>
                 </div>
+                <button onclick="skipLogin()" class="mt-6 text-xs text-slate-400 hover:text-indigo-500 underline transition-colors">Omitir inicio de sesión</button>
             </div>
         </div>
     </div>
@@ -618,7 +640,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -640,6 +662,7 @@
         window.firebaseDb = db;
         window.firebaseProvider = provider;
         window.signInWithPopup = signInWithPopup;
+        window.signInAnonymously = signInAnonymously;
         window.onAuthStateChanged = onAuthStateChanged;
         window.signOut = signOut;
         window.fsDoc = doc;
@@ -659,6 +682,12 @@
         let currentAdjustMode = null;
         const daysMap = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
+        window.skipLogin = function() {
+            window.signInAnonymously(window.firebaseAuth).then(() => {
+                closeModeModal();
+            });
+        }
+
         async function loadLocalData() {
             if(!currentUser) return;
             try {
@@ -672,7 +701,6 @@
                     weekSettings = data.settings || {};
                     currentShiftStart = data.activeShift ? new Date(data.activeShift) : null;
                 } else {
-                    // Try to migrate from local storage if nothing exists in cloud
                     const storedShifts = localStorage.getItem('mjpro_shifts');
                     if (storedShifts) {
                         console.log("Migrating local data to cloud...");
@@ -681,7 +709,7 @@
                         weekSettings = JSON.parse(localStorage.getItem('mjpro_settings') || "{}");
                         const active = localStorage.getItem('mjpro_active_shift');
                         currentShiftStart = active ? new Date(parseInt(active)) : null;
-                        await saveLocalData(); // Push to firebase
+                        await saveLocalData();
                         showToast("Datos locales sincronizados a la nube.");
                     }
                 }
@@ -760,6 +788,52 @@
             updateProgress();
             renderShifts();
             showToast("Configuración global guardada.");
+        }
+
+        window.exportDataToFile = function() {
+            const dataToExport = {
+                shifts: allShifts,
+                tasks: allTasks,
+                settings: weekSettings
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "jornada_respaldo.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            showToast("Respaldo descargado con éxito");
+        }
+
+        window.importDataFromFile = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData.shifts) allShifts = importedData.shifts;
+                    if (importedData.tasks) allTasks = importedData.tasks;
+                    if (importedData.settings) weekSettings = importedData.settings;
+                    
+                    if(currentUser) {
+                        await saveLocalData();
+                    } else {
+                        localStorage.setItem('mjpro_shifts', JSON.stringify(allShifts));
+                        localStorage.setItem('mjpro_tasks', JSON.stringify(allTasks));
+                        localStorage.setItem('mjpro_settings', JSON.stringify(weekSettings));
+                    }
+                    
+                    renderData();
+                    closeConfigModal();
+                    showToast("Datos importados correctamente");
+                } catch (err) {
+                    showToast("Error al importar el archivo", true);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ""; 
         }
 
         window.openModeModal = function() {
@@ -870,7 +944,7 @@
                 }
             });
 
-            await loadLocalData(); // Now loads from Firebase!
+            await loadLocalData(); 
             
             currentWeekId = getIsoWeekString(new Date());
             document.getElementById('week-selector').value = currentWeekId;
@@ -884,7 +958,7 @@
             updateTimeData();
             setInterval(updateTimeData, 1000);
 
-            showToast("Funcionando en modo local (guardado en el navegador)");
+            showToast("☁️ Conectado a la nube y sincronizado");
             renderData();
             
             if (currentShiftStart) {
@@ -1990,6 +2064,29 @@
             const appContent = document.getElementById('app-content');
             const btnLogin = document.getElementById('btn-login');
             const loginLoader = document.getElementById('login-loader');
+
+            const btnSkipLogin = document.getElementById('btn-skip-login');
+
+            btnSkipLogin.addEventListener('click', async () => {
+                // Bypass login and use local storage directly
+                loginScreen.classList.add('opacity-0');
+                setTimeout(async () => {
+                    loginScreen.classList.add('hidden');
+                    appContent.classList.remove('opacity-0', 'pointer-events-none');
+                    // Manually fetch localStorage
+                    try {
+                        const storedShifts = localStorage.getItem('mjpro_shifts');
+                        if(storedShifts) allShifts = JSON.parse(storedShifts);
+                        const storedTasks = localStorage.getItem('mjpro_tasks');
+                        if(storedTasks) allTasks = JSON.parse(storedTasks);
+                        const storedSettings = localStorage.getItem('mjpro_settings');
+                        if(storedSettings) weekSettings = JSON.parse(storedSettings);
+                        const storedActive = localStorage.getItem('mjpro_active_shift');
+                        if(storedActive) currentShiftStart = new Date(parseInt(storedActive));
+                    } catch(e){}
+                    await initApp();
+                }, 500);
+            });
 
             btnLogin.addEventListener('click', () => {
                 btnLogin.classList.add('hidden');
