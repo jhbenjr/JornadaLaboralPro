@@ -1594,41 +1594,37 @@
                 baseTargets[1] = 10; baseTargets[2] = 8.5; baseTargets[3] = 8.5; baseTargets[4] = 8.5; baseTargets[5] = 8.5; baseTargets[6] = 4;
             }
 
-            const dynamicTargets = {...baseTargets};
-            const pendingDays = daysOrder.filter(d => workedHoursPerDay[d] === 0);
+            const dynamicTargets = {};
+            let accumulatedSoFar = 0;
             
-            if (pendingDays.length > 0 && remaining > 0) {
-                let adjustablePending = [];
-                let fixedPending = [];
-                let tempRemaining = remaining;
+            daysOrder.forEach(d => {
+                let hoursLeftForDAndFuture = limit - accumulatedSoFar;
+                let reserved = 0;
                 
-                if (mode === 2) {
-                    fixedPending = pendingDays.filter(d => d === 6); 
-                    adjustablePending = pendingDays.filter(d => d !== 6);
+                if (mode === 2 && d < 6 && daysOrder.includes(6)) {
+                    reserved = baseTargets[6];
+                }
+                
+                let adjustable = hoursLeftForDAndFuture - reserved;
+                if (adjustable < 0) adjustable = 0;
+                
+                let targetD = 0;
+                
+                if (mode === 2 && d === 6) {
+                    targetD = Math.min(baseTargets[6], hoursLeftForDAndFuture);
                 } else {
-                    adjustablePending = [...pendingDays];
+                    let futureAdjustableDays = daysOrder.filter(x => x >= d && (mode === 1 || x !== 6));
+                    
+                    if (futureAdjustableDays[futureAdjustableDays.length - 1] === d) {
+                        targetD = adjustable;
+                    } else {
+                        targetD = Math.min(baseTargets[d], adjustable);
+                    }
                 }
                 
-                fixedPending.forEach(d => { tempRemaining -= baseTargets[d]; });
-                if (tempRemaining < 0) tempRemaining = 0;
-                
-                if (adjustablePending.length > 0) {
-                    let minsRemaining = Math.round(tempRemaining * 60);
-                    adjustablePending.forEach((d, index) => {
-                        let assignedMins = 0;
-                        if (index === adjustablePending.length - 1) {
-                            assignedMins = minsRemaining;
-                        } else {
-                            assignedMins = Math.min(minsRemaining, baseTargets[d] * 60);
-                            assignedMins = Math.floor(assignedMins / 15) * 15;
-                        }
-                        minsRemaining -= assignedMins;
-                        dynamicTargets[d] = Math.max(0, assignedMins / 60);
-                    });
-                }
-            } else if (remaining <= 0) {
-                pendingDays.forEach(d => dynamicTargets[d] = 0);
-            }
+                dynamicTargets[d] = Math.max(0, targetD);
+                accumulatedSoFar += workedHoursPerDay[d];
+            });
             
             daysOrder.forEach(d => {
                 const worked = workedHoursPerDay[d];
