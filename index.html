@@ -1008,6 +1008,7 @@
         }
 
         function renderData() {
+            if (typeof updateShiftUI === 'function') updateShiftUI();
             renderShifts();
             renderTasks();
             updateProgress();
