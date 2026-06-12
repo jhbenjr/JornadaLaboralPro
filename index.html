@@ -641,7 +641,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDocs, getDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAE2vP_no7GbcWau5S_pLUUgwjHJ6NWtyM",
@@ -669,6 +669,7 @@
         window.fsSetDoc = setDoc;
         window.fsGetDoc = getDoc;
         window.fsCollection = collection;
+        window.fsOnSnapshot = onSnapshot;
     </script>
 
     <script>
@@ -688,32 +689,44 @@
             });
         }
 
+        let unsubscribeSnapshot = null;
+
         async function loadLocalData() {
             if(!currentUser) return;
             try {
                 const userDocRef = window.fsDoc(window.firebaseDb, "users", currentUser.uid);
-                const docSnap = await window.fsGetDoc(userDocRef);
                 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    allShifts = data.shifts || [];
-                    allTasks = data.tasks || [];
-                    weekSettings = data.settings || {};
-                    currentShiftStart = data.activeShift ? new Date(data.activeShift) : null;
-                } else {
-                    const storedShifts = localStorage.getItem('mjpro_shifts');
-                    if (storedShifts) {
-                        console.log("Migrating local data to cloud...");
-                        allShifts = JSON.parse(storedShifts);
-                        allTasks = JSON.parse(localStorage.getItem('mjpro_tasks') || "[]");
-                        weekSettings = JSON.parse(localStorage.getItem('mjpro_settings') || "{}");
-                        const active = localStorage.getItem('mjpro_active_shift');
-                        currentShiftStart = active ? new Date(parseInt(active)) : null;
-                        await saveLocalData();
-                        showToast("Datos locales sincronizados a la nube.");
+                if (unsubscribeSnapshot) unsubscribeSnapshot();
+                
+                unsubscribeSnapshot = window.fsOnSnapshot(userDocRef, async (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        allShifts = data.shifts || [];
+                        allTasks = data.tasks || [];
+                        weekSettings = data.settings || {};
+                        currentShiftStart = data.activeShift ? new Date(data.activeShift) : null;
+                        
+                        // Force re-render whenever data changes remotely
+                        if (typeof renderData === 'function') {
+                            renderData();
+                        }
+                    } else {
+                        const storedShifts = localStorage.getItem('mjpro_shifts');
+                        if (storedShifts) {
+                            console.log("Migrating local data to cloud...");
+                            allShifts = JSON.parse(storedShifts);
+                            allTasks = JSON.parse(localStorage.getItem('mjpro_tasks') || "[]");
+                            weekSettings = JSON.parse(localStorage.getItem('mjpro_settings') || "{}");
+                            const active = localStorage.getItem('mjpro_active_shift');
+                            currentShiftStart = active ? new Date(parseInt(active)) : null;
+                            await saveLocalData();
+                            showToast("Datos locales sincronizados a la nube.");
+                        }
                     }
-                }
-            } catch(e) { console.error("Error loading data:", e); }
+                }, (error) => {
+                    console.error("Snapshot error:", error);
+                });
+            } catch(e) { console.error("Error setting up real-time sync:", e); }
         }
 
         async function saveLocalData() {
