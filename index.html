@@ -129,7 +129,7 @@
 <body class="bg-slate-50 text-slate-800 dark:bg-dark-bg dark:text-slate-200 antialiased min-h-screen flex flex-col selection:bg-indigo-500/30">
 
     <nav class="sticky top-0 z-50 glass shadow-sm transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-2 sm:px-6 py-2 sm:py-4 flex justify-between items-center">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 flex items-center justify-between h-full w-full">
             <div class="flex items-center space-x-2 sm:space-x-4">
                 <div class="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl sm:rounded-2xl shadow-lg shadow-indigo-500/20 text-white shrink-0">
                     <i data-lucide="clock" class="w-5 h-5 sm:w-6 sm:h-6"></i>
@@ -155,10 +155,13 @@
                             <i data-lucide="clock" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-violet-500 shrink-0"></i>
                             <span id="live-clock" class="text-sm sm:text-lg font-bold tracking-wider text-slate-800 dark:text-white tabular-nums">00:00</span>
                         </div>
-                        <span id="timezone-label" class="text-[8px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase sm:mt-0.5 group-hover:text-indigo-500 transition-colors">EL SALVADOR</span>
+                        <span id="timezone-label" class="text-[8px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase leading-none group-hover:text-indigo-500 transition-colors">EL SALVADOR</span>
                     </div>
                 </div>
 
+                <button id="btn-toggle-theme" onclick="toggleTheme()" class="p-2 sm:p-2.5 bg-white dark:bg-dark-card border border-slate-200/60 dark:border-dark-border text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-dark-hover rounded-xl transition-all duration-200 shadow-sm shrink-0" title="Cambiar Tema">
+                    <i id="theme-icon" data-lucide="moon" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </button>
                 <button onclick="openConfigModal()" class="p-2 sm:p-2.5 bg-white dark:bg-dark-card border border-slate-200/60 dark:border-dark-border text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-dark-hover rounded-xl transition-all duration-200 shadow-sm shrink-0" title="Configuración Global">
                     <i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </button>
@@ -221,7 +224,7 @@
     </div>
 
     <!-- Admin Dashboard -->
-    <main id="admin-dashboard" class="hidden flex max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-col gap-8 flex-1 w-full opacity-0 transition-opacity duration-500">
+    <main id="admin-dashboard" class="hidden flex max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8 flex-col gap-8 flex-1 w-full opacity-0 transition-opacity duration-500">
         <div class="flex items-center justify-between mb-2">
             <div>
                 <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Panel Maestro</h1>
@@ -280,7 +283,7 @@
         </div>
     </div>
 
-    <main id="app-content" class="hidden max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8 flex-1 w-full opacity-0 transition-opacity duration-500 pointer-events-none">
+    <main id="app-content" class="hidden max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8 flex flex-col gap-8 flex-1 w-full opacity-0 transition-opacity duration-500 pointer-events-none">
         
         <div class="bg-white dark:bg-dark-card rounded-3xl shadow-sm border border-slate-200/60 dark:border-dark-border p-6 sm:p-8 transition-all duration-300 w-full">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1206,17 +1209,16 @@
 
         window.toggleTheme = function(forceDark = null) {
             const html = document.documentElement;
-            const icon = document.getElementById('theme-icon');
             const flatpickrDark = document.getElementById('flatpickr-dark-theme');
             isDarkMode = forceDark !== null ? forceDark : !html.classList.contains('dark');
 
             if (isDarkMode) {
                 html.classList.add('dark');
-                if(icon) icon.setAttribute('data-lucide', 'sun');
+                document.querySelectorAll('#theme-icon').forEach(el => el.setAttribute('data-lucide', 'sun'));
                 if(flatpickrDark) flatpickrDark.removeAttribute('disabled');
             } else {
                 html.classList.remove('dark');
-                if(icon) icon.setAttribute('data-lucide', 'moon');
+                document.querySelectorAll('#theme-icon').forEach(el => el.setAttribute('data-lucide', 'moon'));
                 if(flatpickrDark) flatpickrDark.setAttribute('disabled', 'disabled');
             }
             
@@ -1338,7 +1340,7 @@
             }
             
             const dateStr = now.toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('date-display').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+            document.getElementById('date-display').textContent = dateStr.toUpperCase();
 
             
             if (currentShiftStart && getIsoWeekString(currentShiftStart) === currentWeekId) {
@@ -2519,7 +2521,7 @@
                     setTimeout(() => document.getElementById('admin-dashboard').classList.remove('opacity-0'), 50);
                 };
                 
-                const headerContainer = document.querySelector('nav > div.max-w-7xl');
+                const headerContainer = document.querySelector('nav > div.max-w-\\[1600px\\]') || document.querySelector('nav > div');
                 if (headerContainer) {
                     headerContainer.appendChild(returnBtn);
                 }
@@ -2674,14 +2676,30 @@
                 const tabManual = document.getElementById('tab-manual');
                 if(tabManual) tabManual.style.display = 'none';
                 
-                const rightCol = document.getElementById('col-right');
+                // Reorganize layout for readonly: 50/50 grid with shift card + history side by side
+                const mainGrid = document.querySelector('#app-content > div.grid');
+                const colLeft = document.getElementById('col-left');
+                const colRight = document.getElementById('col-right');
                 const historyCont = document.getElementById('history-container');
-                if(rightCol && historyCont) {
-                    Array.from(rightCol.children).forEach(c => {
-                        if(c.id !== 'history-container') c.style.display = 'none';
-                    });
-                    rightCol.appendChild(historyCont);
-                    rightCol.classList.remove('h-[850px]');
+                const shiftCard = colLeft ? colLeft.querySelector('.bg-white.dark\\:bg-dark-card.rounded-3xl') : null;
+
+                if(mainGrid && colLeft && colRight && historyCont) {
+                    // Hide col-right (tasks panel)
+                    colRight.style.display = 'none';
+
+                    // Move history into main grid as a direct sibling of col-left
+                    historyCont.style.display = 'block';
+
+                    // Reset col-left to take half the grid
+                    colLeft.className = 'lg:col-span-6 flex flex-col gap-6';
+
+                    // Create new right column for history
+                    const newColRight = document.createElement('div');
+                    newColRight.className = 'lg:col-span-6 flex flex-col';
+                    newColRight.id = 'col-right-readonly';
+                    historyCont.style.flex = '1';
+                    newColRight.appendChild(historyCont);
+                    mainGrid.appendChild(newColRight);
                 }
             };
 
