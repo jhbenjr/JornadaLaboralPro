@@ -126,12 +126,12 @@
                     <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Control de Jornada</h1>
                     <div class="flex items-center space-x-2 mt-0.5">
                         <i data-lucide="calendar-clock" class="w-3.5 h-3.5 text-indigo-500"></i>
-                        <input type="week" id="week-selector" onchange="handleWeekChange()" class="text-xs font-semibold bg-transparent text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 outline-none cursor-pointer transition-colors" title="Selecciona una semana">
+                        <input type="week" id="week-selector" onchange="handleWeekChange()" class="text-xs font-semibold bg-transparent text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 outline-none cursor-pointer transition-colors min-w-[140px]" title="Selecciona una semana">
                     </div>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-3 sm:space-x-5">
+            <div class="flex items-center w-full sm:w-auto justify-between sm:justify-end space-x-3 sm:space-x-5 mt-2 sm:mt-0">
                 <div class="flex items-center space-x-2 sm:space-x-4 bg-white/50 dark:bg-dark-card/50 backdrop-blur-md px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl border border-slate-200/60 dark:border-dark-border shadow-sm">
                     <div class="hidden md:flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-300">
                         <i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i>
@@ -150,12 +150,14 @@
                     </div>
                 </div>
 
-                <button onclick="openConfigModal()" class="p-2.5 bg-white dark:bg-dark-card border border-slate-200/60 dark:border-dark-border text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-dark-hover rounded-xl transition-all duration-200 shadow-sm" title="Configuración Global">
-                    <i data-lucide="settings" class="w-5 h-5"></i>
-                </button>
-                <button onclick="toggleTheme()" class="p-2.5 bg-white dark:bg-dark-card border border-slate-200/60 dark:border-dark-border text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-dark-hover rounded-xl transition-all duration-200 shadow-sm" title="Cambiar tema">
-                    <i id="theme-icon" data-lucide="moon" class="w-5 h-5"></i>
-                </button>
+                <div class="flex items-center space-x-2">
+                    <button onclick="openConfigModal()" class="p-2.5 bg-white dark:bg-dark-card border border-slate-200/60 dark:border-dark-border text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-dark-hover rounded-xl transition-all duration-200 shadow-sm" title="Configuración Global">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="toggleTheme()" class="p-2.5 bg-white dark:bg-dark-card border border-slate-200/60 dark:border-dark-border text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-dark-hover rounded-xl transition-all duration-200 shadow-sm" title="Cambiar tema">
+                        <i id="theme-icon" data-lucide="moon" class="w-5 h-5"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
@@ -1296,7 +1298,7 @@
             const dateVal = document.getElementById('manual-date').value;
             const inVal = document.getElementById('manual-in').value;
             const outVal = document.getElementById('manual-out').value;
-            const lunchMins = parseInt(document.getElementById('global-lunch').value) || 0;
+
 
             if(!dateVal || !inVal || !outVal) {
                 showToast("Completa la fecha y horas, por favor.", true); return;
