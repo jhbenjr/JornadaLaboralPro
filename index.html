@@ -1191,10 +1191,10 @@
         }
 
         function renderData() {
-            if (typeof updateShiftUI === 'function') updateShiftUI();
+            updateProgress();
             renderShifts();
             renderTasks();
-            updateProgress();
+            if (typeof updateShiftUI === 'function') updateShiftUI();
         }
 
         window.toggleTheme = function(forceDark = null) {
@@ -1319,12 +1319,15 @@
             const svTime = now.toLocaleTimeString('es-SV', { hour: '2-digit', minute: '2-digit', hour12: false });
             const mdTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/New_York' });
             
+            const tzLabel = document.getElementById('timezone-label');
             if (isMarylandTime) {
                 document.getElementById('live-clock').textContent = mdTime;
                 if(document.getElementById('live-clock-md')) document.getElementById('live-clock-md').textContent = svTime + " SV";
+                if(tzLabel) tzLabel.textContent = "MARYLAND";
             } else {
                 document.getElementById('live-clock').textContent = svTime;
                 if(document.getElementById('live-clock-md')) document.getElementById('live-clock-md').textContent = mdTime + " MD";
+                if(tzLabel) tzLabel.textContent = "EL SALVADOR";
             }
             
             const dateStr = now.toLocaleDateString('es-SV', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -1336,20 +1339,35 @@
                 
                 const regular = parseFloat(document.getElementById('regular-hours-input').value) || (currentAdjustMode === 1 ? 10 : 8.5);
                 const shiftDay = currentShiftStart.getDay();
-                let target = regular;
-                if (currentAdjustMode === 1) target = shiftDay === 5 ? 8 : regular;
-                else if (currentAdjustMode === 2) target = shiftDay === 1 ? 10 : (shiftDay === 6 ? 4 : regular);
+                let target = (window.dynamicTargets && window.dynamicTargets[shiftDay] !== undefined) ? window.dynamicTargets[shiftDay] : regular;
                 
                 const projEl = document.getElementById('projected-out-time');
                 if (projEl) {
-                    const projectedEndTimestamp = currentShiftStart.getTime() + (target * 3600000);
+                    const dateStr = `${getDayName(currentShiftStart)} ${formatShortDate(currentShiftStart)}`;
+                    const now = new Date();
+                    const liveDuration = (now - currentShiftStart) / 3600000;
+                    const previouslyWorkedToday = (window.dailyTotals && window.dailyTotals[dateStr] ? window.dailyTotals[dateStr] : 0) - liveDuration;
+                    
+                    const targetRemainingForShift = Math.max(0, target - previouslyWorkedToday);
+                    
+                    const projectedEndTimestamp = currentShiftStart.getTime() + (targetRemainingForShift * 3600000);
                     const projectedDate = new Date(projectedEndTimestamp);
+                    
+                    const isPassed = now.getTime() >= projectedEndTimestamp;
+                    if (isPassed) {
+                        projEl.classList.remove('text-emerald-600', 'dark:text-emerald-400');
+                        projEl.classList.add('text-red-500', 'dark:text-red-400');
+                    } else {
+                        projEl.classList.remove('text-red-500', 'dark:text-red-400');
+                        projEl.classList.add('text-emerald-600', 'dark:text-emerald-400');
+                    }
                     
                     if (isMarylandTime) {
                         projEl.textContent = formatDisplayTime(formatHHMM(projectedDate), projectedEndTimestamp);
                     } else {
                         const mdTime = formatDisplayTime(formatHHMM(projectedDate), projectedEndTimestamp, true);
-                        projEl.innerHTML = `${formatHHMM(projectedDate)} <span class="text-[10px] sm:text-xs font-bold text-emerald-500/70 dark:text-emerald-400/70 ml-1">(${mdTime} MD)</span>`;
+                        const spanColor = isPassed ? 'text-red-500/70 dark:text-red-400/70' : 'text-emerald-500/70 dark:text-emerald-400/70';
+                        projEl.innerHTML = `${formatHHMM(projectedDate)} <span class="text-[10px] sm:text-xs font-bold ${spanColor} ml-1">(${mdTime} MD)</span>`;
                     }
                 }
                 const liveDuration = (now - currentShiftStart) / 3600000;
@@ -1366,8 +1384,8 @@
                         remKpi.className = "text-base sm:text-lg font-black text-amber-600 dark:text-amber-400 tabular-nums leading-none";
                         if(remUnit) remUnit.style.display = 'inline';
                     } else {
-                        remKpi.textContent = "¡Meta!";
-                        remKpi.className = "text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 tabular-nums leading-none uppercase";
+                        remKpi.textContent = "Turno completado";
+                        remKpi.className = "text-[12px] sm:text-[13px] font-black text-emerald-600 dark:text-emerald-400 leading-none uppercase mt-1";
                         if(remUnit) remUnit.style.display = 'none';
                     }
                 }
@@ -1594,7 +1612,7 @@
                 baseTargets[1] = 10; baseTargets[2] = 8.5; baseTargets[3] = 8.5; baseTargets[4] = 8.5; baseTargets[5] = 8.5; baseTargets[6] = 4;
             }
 
-            const dynamicTargets = {};
+            window.dynamicTargets = {};
             let accumulatedSoFar = 0;
             
             daysOrder.forEach(d => {
@@ -1622,13 +1640,13 @@
                     }
                 }
                 
-                dynamicTargets[d] = Math.max(0, targetD);
+                window.dynamicTargets[d] = Math.max(0, targetD);
                 accumulatedSoFar += workedHoursPerDay[d];
             });
             
             daysOrder.forEach(d => {
                 const worked = workedHoursPerDay[d];
-                const target = dynamicTargets[d];
+                const target = window.dynamicTargets[d];
                 
                 let bgColor = 'bg-slate-50 dark:bg-dark-bg';
                 let textColor = 'text-slate-500 dark:text-slate-400';
@@ -1790,30 +1808,22 @@
             const regular = parseFloat(document.getElementById('regular-hours-input').value) || (currentAdjustMode === 1 ? 10 : 8.5);
             let total = 0;
 
-            const dailyTotals = {};
+            window.dailyTotals = {};
             weekShifts.forEach(s => {
-                if(!dailyTotals[s.dateStr]) dailyTotals[s.dateStr] = 0;
-                dailyTotals[s.dateStr] += s.duration;
+                if(!window.dailyTotals[s.dateStr]) window.dailyTotals[s.dateStr] = 0;
+                window.dailyTotals[s.dateStr] += s.duration;
             });
             if (hasLiveShift) {
                 const liveDateStr = `${getDayName(currentShiftStart)} ${formatShortDate(currentShiftStart)}`;
-                if(!dailyTotals[liveDateStr]) dailyTotals[liveDateStr] = 0;
-                dailyTotals[liveDateStr] += (new Date() - currentShiftStart) / 3600000;
+                if(!window.dailyTotals[liveDateStr]) window.dailyTotals[liveDateStr] = 0;
+                window.dailyTotals[liveDateStr] += (new Date() - currentShiftStart) / 3600000;
             }
 
             weekShifts.sort((a,b) => a.timestamp - b.timestamp).forEach(s => {
                 const shiftDay = new Date(s.timestamp).getDay();
-                let target = 0;
-                
-                if (currentAdjustMode === 1) {
-                    target = shiftDay === 5 ? 8 : regular;
-                } else if (currentAdjustMode === 2) {
-                    target = shiftDay === 1 ? 10 : (shiftDay === 6 ? 4 : regular);
-                } else {
-                    target = regular;
-                }
+                let target = (window.dynamicTargets && window.dynamicTargets[shiftDay] !== undefined) ? window.dynamicTargets[shiftDay] : regular;
 
-                const dayTotal = dailyTotals[s.dateStr];
+                const dayTotal = window.dailyTotals[s.dateStr];
                 const diff = dayTotal - target;
                 const diffStr = diff >= 0 ? `+${formatDecimalHours(diff)}` : `-${formatDecimalHours(Math.abs(diff))}`;
                 const diffColor = diff > 0 ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10' : (diff < 0 ? 'text-red-500 bg-red-50 dark:bg-red-500/10' : 'text-slate-400 bg-slate-50 dark:bg-dark-bg');
@@ -1842,12 +1852,10 @@
                 const now = new Date();
                 const liveDuration = (now - currentShiftStart) / 3600000;
                 const shiftDay = currentShiftStart.getDay();
-                let target = regular;
-                if (currentAdjustMode === 1) target = shiftDay === 5 ? 8 : regular;
-                else if (currentAdjustMode === 2) target = shiftDay === 1 ? 10 : (shiftDay === 6 ? 4 : regular);
+                let target = (window.dynamicTargets && window.dynamicTargets[shiftDay] !== undefined) ? window.dynamicTargets[shiftDay] : regular;
                 
                 const dateStr = `${getDayName(currentShiftStart)} ${formatShortDate(currentShiftStart)}`;
-                const dayTotal = dailyTotals[dateStr];
+                const dayTotal = window.dailyTotals[dateStr];
                 
                 const diff = dayTotal - target;
                 const diffStr = diff >= 0 ? `+${formatDecimalHours(diff)}` : `-${formatDecimalHours(Math.abs(diff))}`;
