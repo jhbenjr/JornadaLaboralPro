@@ -831,6 +831,10 @@
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     document.getElementById('kiosk-username').blur();
+                    // Si no hay PIN, entrar en modo observador directamente
+                    if(currentPin.length === 0 && window.attemptReadonly) {
+                        window.attemptReadonly();
+                    }
                 }
                 return;
             }
@@ -845,7 +849,10 @@
                 window.clearPin();
             } else if (e.key === 'Enter') {
                 e.preventDefault();
-                if (currentPin.length >= 4 && window.attemptLogin) {
+                const usernameVal = document.getElementById('kiosk-username')?.value.trim();
+                if (currentPin.length === 0 && usernameVal && window.attemptReadonly) {
+                    window.attemptReadonly();
+                } else if (currentPin.length >= 4 && window.attemptLogin) {
                     window.attemptLogin();
                 }
             }
@@ -2577,6 +2584,8 @@
             window.attemptLogin = async function() {
                 const username = document.getElementById('kiosk-username').value.trim().toLowerCase();
                 if(!username) return showToast("Ingresa tu usuario", true);
+                // Sin PIN → modo observador
+                if(currentPin.length === 0) return window.attemptReadonly();
                 if(currentPin.length < 4) return showToast("PIN muy corto", true);
 
                 loginLoader.classList.remove('hidden');
