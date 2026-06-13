@@ -1493,10 +1493,10 @@
                 if (projEl) {
                     const dateStr = `${getDayName(currentShiftStart)} ${formatShortDate(currentShiftStart)}`;
                     const now = new Date();
-                    const liveDuration = (now - currentShiftStart) / 3600000;
-                    const previouslyWorkedToday = (window.dailyTotals && window.dailyTotals[dateStr] ? window.dailyTotals[dateStr] : 0) - liveDuration;
+                    const pastShiftsToday = allShifts.filter(s => s.weekId === currentWeekId && s.dateStr === dateStr);
+                    const previouslyWorkedToday = pastShiftsToday.reduce((sum, s) => sum + s.duration, 0);
                     
-                    const targetRemainingForShift = Math.max(0, target - previouslyWorkedToday);
+                    const targetRemainingForShift = target - previouslyWorkedToday;
                     
                     const projectedEndTimestamp = currentShiftStart.getTime() + (targetRemainingForShift * 3600000);
                     const projectedDate = new Date(projectedEndTimestamp);
