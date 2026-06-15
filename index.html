@@ -465,6 +465,9 @@
                                 </div>
                                 Planificación de Tareas
                             </h2>
+                            <button onclick="findTimeGaps()" class="px-3 py-1.5 bg-emerald-100 text-emerald-600 hover:bg-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm" title="Buscar huecos libres en el día actual">
+                                <i data-lucide="wand-2" class="w-3.5 h-3.5"></i> Huecos
+                            </button>
                         </div>
                         
                         <div class="space-y-3.5 bg-white dark:bg-dark-bg p-5 rounded-2xl border border-slate-200/60 dark:border-dark-border shadow-sm">
@@ -730,6 +733,27 @@
         </div>
     </div>
 
+    <!-- TIME GAPS MODAL -->
+    <div id="gaps-modal" class="fixed inset-0 bg-slate-900/50 dark:bg-black/70 backdrop-blur-sm z-[115] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-dark-card w-full max-w-md rounded-3xl shadow-2xl border border-slate-200/60 dark:border-dark-border overflow-hidden transform scale-95 transition-transform duration-300" id="gaps-modal-content">
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-dark-border flex justify-between items-center bg-slate-50 dark:bg-dark-bg">
+                <h3 class="font-bold text-lg flex items-center text-slate-800 dark:text-white tracking-tight">
+                    <div class="p-1.5 bg-emerald-500/10 rounded-lg mr-3 text-emerald-600 dark:text-emerald-400">
+                        <i data-lucide="wand-2" class="w-5 h-5"></i>
+                    </div>
+                    Huecos Libres
+                </h3>
+                <button onclick="closeGapsModal()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white bg-white dark:bg-dark-card rounded-full shadow-sm border border-slate-200 dark:border-dark-border transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-6 bg-white dark:bg-dark-card">
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Estos son los espacios sin tareas encontrados para hoy entre tu hora de inicio y salida.</p>
+                <div id="gaps-list" class="space-y-3 max-h-[350px] overflow-y-auto custom-scroll pr-1">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- CONFLICT RESOLUTION MODAL -->
     <div id="conflict-modal" class="fixed inset-0 bg-slate-900/50 dark:bg-black/70 backdrop-blur-sm z-[120] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-dark-card w-full max-w-md rounded-3xl shadow-2xl border border-slate-200/60 dark:border-dark-border overflow-hidden">
@@ -786,6 +810,14 @@
                     <div class="relative group">
                         <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Horas Regulares</label>
                         <input type="number" id="regular-hours-input" value="10" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-bold">
+                    </div>
+                    <div class="relative group mt-2">
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Inicio Turno (Default)</label>
+                        <input type="text" id="shift-start-input" placeholder="07:00" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-bold">
+                    </div>
+                    <div class="relative group mt-2">
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Fin Turno (Default)</label>
+                        <input type="text" id="shift-end-input" placeholder="17:00" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl text-sm dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-bold">
                     </div>
                 </div>
                 
@@ -1080,6 +1112,16 @@
         window.openConfigModal = function() {
             document.getElementById('limit-input').value = weekSettings[currentWeekId]?.limit || 48;
             document.getElementById('regular-hours-input').value = weekSettings[currentWeekId]?.regular || 10;
+            
+            // Initialize flatpickr on the new inputs if not already
+            if (!document.getElementById('shift-start-input')._flatpickr) {
+                flatpickr("#shift-start-input", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true, disableMobile: "true" });
+                flatpickr("#shift-end-input", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true, disableMobile: "true" });
+            }
+            
+            document.getElementById('shift-start-input').value = weekSettings[currentWeekId]?.defaultStart || '07:00';
+            document.getElementById('shift-end-input').value = weekSettings[currentWeekId]?.defaultEnd || '17:00';
+            
             setTempMode(currentAdjustMode || 1);
 
             const isAdm = (localStorage.getItem('kiosk_user') === 'admin');
@@ -1128,9 +1170,11 @@
         window.saveConfig = function() {
             const limit = parseFloat(document.getElementById('limit-input').value) || 48;
             const regular = parseFloat(document.getElementById('regular-hours-input').value) || (tempAdjustMode === 1 ? 10 : 8.5);
+            const defaultStart = document.getElementById('shift-start-input').value || '07:00';
+            const defaultEnd = document.getElementById('shift-end-input').value || '17:00';
             
             currentAdjustMode = tempAdjustMode;
-            weekSettings[currentWeekId] = { limit, regular, mode: currentAdjustMode };
+            weekSettings[currentWeekId] = { limit, regular, mode: currentAdjustMode, defaultStart, defaultEnd };
             saveLocalData();
             
             closeConfigModal();
@@ -1224,6 +1268,8 @@
             const s = weekSettings[currentWeekId];
             document.getElementById('limit-input').value = s.limit;
             document.getElementById('regular-hours-input').value = s.regular;
+            document.getElementById('shift-start-input').value = s.defaultStart || '07:00';
+            document.getElementById('shift-end-input').value = s.defaultEnd || '17:00';
             currentAdjustMode = s.mode;
         }
 
@@ -2524,6 +2570,113 @@
             modal.classList.add('opacity-0');
             document.getElementById('edit-task-modal-content').classList.add('scale-95');
             setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        window.closeGapsModal = function() {
+            const modal = document.getElementById('gaps-modal');
+            modal.classList.add('opacity-0');
+            document.getElementById('gaps-modal-content').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        window.findTimeGaps = function() {
+            let todayDay = new Date().getDay();
+            if(todayDay === 0) todayDay = 7;
+            
+            const s = weekSettings[currentWeekId] || {};
+            const shiftStart = s.defaultStart || '07:00';
+            const shiftEnd = s.defaultEnd || '17:00';
+
+            const weekTasks = allTasks.filter(t => t.weekId === currentWeekId && t.dayIdx === todayDay);
+            const globalToday = [];
+            globalTasks.forEach(g => {
+                const gDays = g.days || [g.dayIdx];
+                if (gDays.includes(todayDay)) {
+                    globalToday.push({ ...g, dayIdx: todayDay, isGlobal: true });
+                }
+            });
+            const allVisible = [...weekTasks, ...globalToday];
+            
+            allVisible.sort((a,b) => a.start.localeCompare(b.start));
+
+            const gaps = [];
+            let currentPointer = shiftStart;
+
+            allVisible.forEach(t => {
+                if (t.start > currentPointer) {
+                    gaps.push({ start: currentPointer, end: t.start });
+                }
+                if (t.end > currentPointer) {
+                    currentPointer = t.end;
+                }
+            });
+
+            if (shiftEnd > currentPointer) {
+                gaps.push({ start: currentPointer, end: shiftEnd });
+            }
+
+            const parseMins = (str) => { const [h,m] = str.split(':'); return parseInt(h)*60 + parseInt(m); };
+            const validGaps = gaps.filter(g => (parseMins(g.end) - parseMins(g.start)) >= 10);
+
+            if (validGaps.length === 0) {
+                showToast("No se encontraron huecos libres mayores a 10 min.", false);
+                return;
+            }
+
+            const listEl = document.getElementById('gaps-list');
+            listEl.innerHTML = '';
+            
+            validGaps.forEach(g => {
+                const duration = parseMins(g.end) - parseMins(g.start);
+                const hrs = Math.floor(duration/60);
+                const mins = duration % 60;
+                let durStr = hrs > 0 ? `${hrs}h ` : '';
+                if(mins > 0 || hrs === 0) durStr += `${mins}min`;
+
+                listEl.innerHTML += `
+                    <div class="p-4 rounded-2xl border border-emerald-200/60 dark:border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/5 flex items-center justify-between transition-colors">
+                        <div>
+                            <div class="text-emerald-600 dark:text-emerald-400 font-bold text-sm tracking-wide tabular-nums">
+                                ${formatDisplayTime(g.start, null)} - ${formatDisplayTime(g.end, null)}
+                            </div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
+                                <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${durStr} libres
+                            </div>
+                        </div>
+                        <button onclick="fillGap('${g.start}', '${g.end}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm shadow-emerald-500/20 hover:-translate-y-0.5">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Llenar
+                        </button>
+                    </div>
+                `;
+            });
+
+            lucide.createIcons();
+            const modal = document.getElementById('gaps-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                document.getElementById('gaps-modal-content').classList.remove('scale-95');
+            }, 10);
+        }
+
+        window.fillGap = function(start, end) {
+            closeGapsModal();
+            let todayDay = new Date().getDay();
+            if(todayDay === 0) todayDay = 7;
+            
+            document.querySelectorAll('.day-btn-task').forEach(b => {
+                b.classList.remove('selected', 'bg-violet-500', 'text-white', 'border-violet-500');
+                b.classList.add('border-slate-200', 'dark:border-dark-border', 'text-slate-500', 'dark:text-slate-400');
+            });
+            const btn = Array.from(document.querySelectorAll('.day-btn-task')).find(b => parseInt(b.dataset.day) === todayDay);
+            if(btn) {
+                btn.classList.add('selected', 'bg-violet-500', 'text-white', 'border-violet-500');
+                btn.classList.remove('border-slate-200', 'dark:border-dark-border', 'text-slate-500', 'dark:text-slate-400');
+            }
+            
+            document.getElementById('task-start')._flatpickr.setDate(start);
+            document.getElementById('task-end')._flatpickr.setDate(end);
+            document.getElementById('task-desc').focus();
         }
 
         window.saveEditedTask = function() {
