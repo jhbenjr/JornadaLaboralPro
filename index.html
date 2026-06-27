@@ -1890,7 +1890,7 @@
                 let targetD = 0;
                 
                 if (mode === 2 && d === 6) {
-                    targetD = Math.min(baseTargets[6], hoursLeftForDAndFuture);
+                    targetD = hoursLeftForDAndFuture;
                 } else {
                     let futureAdjustableDays = daysOrder.filter(x => x >= d && (mode === 1 || x !== 6));
                     
