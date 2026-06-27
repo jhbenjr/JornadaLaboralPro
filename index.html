@@ -1866,7 +1866,7 @@
             }
 
             window.dynamicTargets = {};
-            let accumulatedSoFar = 0;
+            let accumulatedSoFar = workedHoursPerDay[0] || 0;
             
             let todayDay = new Date().getDay();
             if(todayDay === 0) todayDay = 7;
